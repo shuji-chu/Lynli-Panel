@@ -201,6 +201,7 @@ Lynli 有配套的 Android 客户端（基于 CMFA 修改）：
 |---|---|---|
 | 签到群 | https://m.mivra.im/SOCKS5 | 每天签到领 1-3 GB 流量 |
 | 搜索引擎群 | https://m.mivra.im/ys888 | 产品交流 / 技术讨论 |
+| TG 签到群 | https://t.me/qingtian_vip | Telegram 签到 / 交流 |
 | Issues | https://github.com/shuji-chu/Lynli-Panel/issues | 提 bug / 建议 |
 
 > 注：以上链接是官方演示实例。**自己部署时，把这两个链接换成你自己的。**
