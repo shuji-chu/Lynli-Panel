@@ -1,0 +1,14 @@
+*.bak
+*.bak.*
+__pycache__/
+*.pyc
+*.log
+*.db
+*.db-shm
+*.db-wal
+config.json
+uploads/
+venv/
+.env
+.DS_Store
+node_modules/

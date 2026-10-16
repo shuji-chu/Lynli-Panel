@@ -1,0 +1,22 @@
+{
+  "base_url": "https://your-domain.com",
+  "server_ip": "1.2.3.4",
+  "smtp_host": "smtpdm.aliyun.com",
+  "smtp_port": 465,
+  "smtp_user": "you@your-domain.com",
+  "smtp_pass": "your-smtp-password",
+  "sender_email": "you@your-domain.com",
+  "sender_name": "Lynli",
+  "zhipu_key": "",
+  "oss_ak_id": "",
+  "oss_ak_secret": "",
+  "oss_bucket": "",
+  "oss_endpoint_internal": "oss-cn-hongkong-internal.aliyuncs.com",
+  "oss_endpoint_public": "oss-cn-hongkong.aliyuncs.com",
+  "oss_public_url": "",
+  "hy2_password": "change-me",
+  "hy2_obfs_password": "change-me",
+  "hy2_sni": "www.bing.com",
+  "hy2_port": 443,
+  "oauth_github_callback": "https://your-domain.com/api/v1/passport/oauth/github/callback"
+}
