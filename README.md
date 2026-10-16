@@ -1,52 +1,68 @@
 <div align="center">
 
-# 🚀 Lynli Panel
+# Lynli Panel
 
-**轻量 VPN / 代理管理面板**
+**轻量级 VPN / 代理订阅管理平台**
 
-Python + SQLite 后端 · 原生 HTML/JS 前端 · 零框架依赖
+Python · SQLite · 原生 HTML/JS · 零框架依赖
 
-[![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
-[![Python](https://img.shields.io/badge/Python-3.8%2B-3776AB.svg?logo=python&logoColor=white)](https://www.python.org/)
-[![SQLite](https://img.shields.io/badge/SQLite-3-003B57.svg?logo=sqlite&logoColor=white)](https://sqlite.org)
-[![Clash](https://img.shields.io/badge/Clash-yaml-2E5BFF.svg)](#订阅格式)
-[![V2Ray](https://img.shields.io/badge/V2Ray-base64-blueviolet.svg)](#订阅格式)
-[![sing-box](https://img.shields.io/badge/sing--box-json-green.svg)](#订阅格式)
-
-[![Stars](https://img.shields.io/github/stars/shuji-chu/Lynli-Panel?style=social)](https://github.com/shuji-chu/Lynli-Panel/stargazers)
-[![Forks](https://img.shields.io/github/forks/shuji-chu/Lynli-Panel?style=social)](https://github.com/shuji-chu/Lynli-Panel/network/members)
-
-[功能](#-功能) · [快速开始](#-快速开始) · [API](#-api-文档) · [联系我](#-联系我)
-
----
+[![License](https://img.shields.io/badge/License-AGPL_v3-2E5BFF.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/Python-3.8%2B-3776AB.svg)](https://www.python.org/)
+[![SQLite](https://img.shields.io/badge/SQLite-3-003B57.svg)](https://sqlite.org)
+[![Clash](https://img.shields.io/badge/Clash-yaml-2E5BFF.svg)](#订阅)
+[![V2Ray](https://img.shields.io/badge/V2Ray-base64-7C3AED.svg)](#订阅)
+[![sing-box](https://img.shields.io/badge/sing--box-json-16A34A.svg)](#订阅)
 
 </div>
 
+---
 
-> 轻量 VPN/代理管理面板。Python + SQLite 后端，纯 HTML/JS 前端，支持 Clash / V2Ray / sing-box 多格式订阅。
->
-> **这是一个个人学习项目**。我在练习 Python 后端和原生前端的过程中写了它，跑起来能用，但**不保证生产级稳定**。欢迎交流、指正、提 PR。
-> 如果你也在做类似的东西，或者对代码有任何想法，**Issues 和 PR 都欢迎**。
+Lynli Panel 是一套面向个人及小型服务商的 VPN / 代理订阅管理平台。后端基于 Python 标准库实现，前端为纯原生 HTML/JS，无需构建工具即可部署。
+
+覆盖用户管理、订单支付、订阅下发、节点调度、数据统计、客服工单、开放平台等完整业务闭环。
 
 ## 功能
 
-- 用户 / 订单 / 套餐 / 邀请 / 提现 管理
-- 节点 / 服务器 / Hysteria2 管理，多服务器切换
-- 支付宝 + USDT (TRC20) 支付，自动开通
-- 数据看板（转化率 / ARPU / 复购 / 留存）
+**用户与订阅**
+- 注册 / 登录 / 图形验证码 / 邮箱验证
+- 多设备登录、登录记录、踢下线
+- 三级分销、邀请奖励流量、邀请树
+- 订阅三格式：Clash YAML / V2Ray base64 / sing-box JSON
+- 节点多地区分组、自动选择、订阅自动更新
+
+**套餐与订单**
+- 套餐配置、订单管理、手动补单、退款 / 作废
+- 优惠码、兑换码、活动配置
+
+**支付**
+- 支付宝（nzzf 通道）
+- USDT（TRC20 链上监听，自动到账）
+
+**运营与客服**
+- 工单系统 + AI 自动回复
 - 邮件群发 + 模板库
-- 优惠码 / 兑换码
-- 工单 + AI 客服自动回复
-- 公告（置顶 / 定向套餐 / 弹窗-横幅-红点）
-- 订阅三格式：/sub/{token} · ?target=v2ray · ?target=singbox
-- 多设备登录 / 登录记录 / 邀请树 / 三级分销
-- SQLite 自动备份到 OSS
+- 公告推送（置顶 / 定向 / 弹窗-横幅-红点）
+- 提现审核、钱包审核、广告位管理
+
+**系统**
+- 数据看板（转化率 / ARPU / ARPPU / 复购 / 留存 / 邀请占比）
+- 服务器管理、节点管理、机器人渠道
+- 系统监控（CPU / 内存 / 磁盘 / 服务状态）
+- 崩溃日志、应用运行日志
+- SQLite 自动备份至阿里云 OSS
+
+**开放平台**
+- 统一 API 网关（身份识别 / 限流 / 全量日志）
+- API Key 自助申请与审批
+- scopes 权限分级（read / write / all）
+- 对外公开 API 文档
 
 ## 快速开始
 
 ### 环境要求
 
 - Ubuntu 20.04+ / Debian 11+
+- Python 3.8+
 - root 权限
 
 ### 一键部署
@@ -55,28 +71,27 @@ Python + SQLite 后端 · 原生 HTML/JS 前端 · 零框架依赖
     cd Lynli-Panel
     sudo bash install.sh
 
-### 改配置
+### 修改配置
 
-    sudo vim /opt/lynli-panel/config.json
+编辑 `/opt/lynli-panel/config.json`：
 
-关键字段：
+| 字段 | 说明 |
+|---|---|
+| base_url | 站点域名 |
+| smtp_* | 邮箱服务 |
+| zhipu_key | 智谱 AI Key（可留空） |
+| oss_* | 阿里云 OSS（可留空） |
+| hy2_* | Hysteria2 节点密码 |
 
-- base_url — 你的域名，如 https://panel.example.com
-- smtp_* — 邮箱服务（发验证码用）
-- zhipu_key — 智谱 AI key（客服 AI 用，可留空）
-- oss_* — 阿里云 OSS（存图片用，可留空）
-- hy2_* — Hysteria2 节点密码
-- oauth_github_callback — GitHub 登录回调（可留空）
-
-改完重启：
+修改后重启：
 
     systemctl restart lynli-api
 
 ### 部署管理面板
 
-admin/ 目录是纯静态页面，扔到 Nginx / Vercel / Cloudflare Pages 都行。
+admin/ 目录为纯静态页面，可部署至 Nginx / Vercel / Cloudflare Pages。
 
-打开 admin/app.js，找到顶部 API 地址配置，改成你的域名。
+打开 admin/app.js，修改顶部 API 常量为你的域名。
 
 ### Nginx 反代示例
 
@@ -93,41 +108,36 @@ admin/ 目录是纯静态页面，扔到 Nginx / Vercel / Cloudflare Pages 都�
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         }
-        location /uploads/ {
-            alias /opt/lynli-panel/uploads/;
-        }
     }
 
 ## API 文档
 
-认证：所有需要登录的接口用 header
+认证：`Authorization: Bearer <token>`
 
-    Authorization: Bearer <token>
+开放平台：`X-API-Key: lyn_xxxxxxxx`
 
-### 用户侧接口（节选）
+### 用户侧
 
 | 路径 | 方法 | 说明 |
 |---|---|---|
-| /api/v1/config | GET | 首页配置 |
-| /api/v1/passport/auth/register | POST | 注册 |
+| /api/v1/config | GET | 站点配置 |
 | /api/v1/passport/auth/login | POST | 登录 |
-| /api/v1/passport/auth/send-code | POST | 发邮箱验证码 |
-| /api/v1/auth/captcha | GET | 获取图形验证码 |
-| /api/v1/auth/captcha/check | POST | 校验图形验证码 |
+| /api/v1/passport/auth/register | POST | 注册 |
+| /api/v1/auth/captcha | GET | 图形验证码 |
 | /api/v1/user/info | GET | 用户信息 |
 | /api/v1/user/plan/fetch | GET | 套餐列表 |
 | /api/v1/user/order/save | POST | 创建订单 |
 | /api/v1/user/order/pay | POST | 调起支付 |
-| /api/v1/user/order/query | GET | 查询支付状态 |
-| /api/v1/sub/{token} | GET | 订阅 (Clash YAML) |
-| /api/v1/sub/{token}?target=v2ray | GET | 订阅 (V2Ray base64) |
-| /api/v1/sub/{token}?target=singbox | GET | 订阅 (sing-box JSON) |
-| /api/v1/user/invite/fetch | GET | 我的邀请 |
-| /api/v1/user/ticket/fetch | GET | 工单列表 |
-| /api/v1/user/chat/send | POST | 客服消息（AI 自动回复） |
-| /api/v1/user/notices | GET | 公告 |
 
-### 管理侧接口（节选）
+### 订阅
+
+| 路径 | 格式 |
+|---|---|
+| /api/v1/sub/{token} | Clash YAML |
+| /api/v1/sub/{token}?target=v2ray | V2Ray base64 |
+| /api/v1/sub/{token}?target=singbox | sing-box JSON |
+
+### 管理侧
 
 | 路径 | 方法 | 说明 |
 |---|---|---|
@@ -135,86 +145,98 @@ admin/ 目录是纯静态页面，扔到 Nginx / Vercel / Cloudflare Pages 都�
 | /api/v1/admin/dashboard | GET | 数据看板 |
 | /api/v1/admin/stats/overview | GET | 深度指标 |
 | /api/v1/admin/users | GET | 用户列表 |
-| /api/v1/admin/users/detail?id=1 | GET | 用户详情（含订单/工单/日志） |
-| /api/v1/admin/orders | GET | 订单 |
-| /api/v1/admin/plans | GET/POST | 套餐 |
-| /api/v1/admin/servers | GET/POST | 服务器 |
-| /api/v1/admin/nodes | GET | 节点 |
-| /api/v1/admin/notices | GET/POST | 公告 |
-| /api/v1/admin/coupons | GET/POST | 优惠码 |
-| /api/v1/admin/redeem_codes | GET/POST | 兑换码 |
-| /api/v1/admin/ticket/list | GET | 工单 |
+| /api/v1/admin/orders | GET | 订单列表 |
+| /api/v1/admin/plans | GET/POST | 套餐管理 |
+| /api/v1/admin/servers | GET/POST | 服务器管理 |
+| /api/v1/admin/notices | GET/POST | 公告管理 |
 | /api/v1/admin/withdrawals | GET | 提现审核 |
-| /api/v1/admin/mail/send | POST | 邮件群发 |
-| /api/v1/admin/mail/templates | GET/POST | 邮件模板 |
 | /api/v1/admin/settings | GET/POST | 系统设置 |
 | /api/v1/admin/invites/tree | GET | 邀请树 |
 
+### 开放平台
+
+| 路径 | 方法 | 说明 |
+|---|---|---|
+| /api/v1/docs | GET | 对外公开 API 文档 |
+| /api/v1/apply | POST | 提交 API Key 申请 |
+| /api/v1/whoami | GET | 查询当前身份 |
+| /api/v1/admin/apply/list | GET | 申请列表 |
+| /api/v1/admin/apply/review | POST | 审批 |
+| /api/v1/admin/apikeys | GET | Key 列表 |
+| /api/v1/admin/apilogs | GET | 调用日志 |
+
+调用示例：
+
+    curl -H "X-API-Key: lyn_xxxxxxxx" \
+         https://panel.example.com/api/v1/plans
+
 ## 技术栈
 
-- 后端：Python 3.8+，stdlib http.server（多线程），SQLite（WAL 模式）
-- 前端：原生 HTML / CSS / JS，零依赖
+- 后端：Python 3.8+ · 标准库 http.server（多线程）· SQLite（WAL）
+- 前端：原生 HTML / CSS / JavaScript，零构建、零依赖
 - 部署：systemd + Nginx
 
 ## 目录结构
 
     Lynli-Panel/
-    ├── server.py            # HTTP 服务入口
-    ├── db.py                # SQLite 初始化 + 工具函数
-    ├── config.py            # 配置读取（从 config.json）
-    ├── config.example.json  # 配置模板
-    ├── api_admin.py         # 管理后台接口
-    ├── api_auth.py          # 登录注册
-    ├── api_user.py          # 用户侧接口
-    ├── api_orders.py        # 订单
-    ├── api_pay.py           # 支付（支付宝 + USDT）
-    ├── api_extra.py         # 兑换码 / 客服 AI
-    ├── api_oauth.py         # GitHub 登录
-    ├── api_captcha.py       # 图形验证码
-    ├── api_upload.py        # 文件上传
-    ├── email_sender.py      # 邮件
-    ├── bots_bridge.py       # 机器人桥接
-    ├── admin/               # 管理面板（纯静态）
-    └── install.sh           # 一键部署
+    ├── server.py            HTTP 服务入口
+    ├── db.py                SQLite 初始化与工具
+    ├── config.py            配置读取
+    ├── config.example.json  配置模板
+    ├── gateway.py           API 网关（身份 / 限流 / 日志）
+    ├── api_admin.py         管理后台接口
+    ├── api_auth.py          登录注册
+    ├── api_user.py          用户侧接口
+    ├── api_orders.py        订单
+    ├── api_pay.py           支付（支付宝 + USDT）
+    ├── api_extra.py         兑换码 / 客服 AI
+    ├── api_oauth.py         GitHub 登录
+    ├── api_captcha.py       图形验证码
+    ├── api_crash.py         崩溃 / 日志上报
+    ├── api_gateway.py       开放平台（Key / 申请 / 日志）
+    ├── api_public.py        对外公开接口（docs / apply）
+    ├── api_upload.py        文件上传
+    ├── email_sender.py      邮件
+    ├── bots_bridge.py       机器人桥接
+    ├── admin/               管理面板（纯静态）
+    └── install.sh           一键部署
 
-## 许可
+## 配套客户端
 
-AGPL-3.0（详见 LICENSE）
+Lynli 提供配套 Android 客户端（基于 Clash Meta for Android 修改）：
 
-任何人可以自由使用、修改、分发，但修改后必须在相同许可下开源。
+- 一键连接、分应用代理、每日签到
+- 节点分组、订阅自动更新
+- 与面板共用同一套 API，填入域名即可对接
 
-## 📱 配套 APP
-
-Lynli 有配套的 Android 客户端（基于 CMFA 修改）：
-
-- 一键连接 / 分应用代理 / 每日签到
-- 与面板共用同一套 API，填你的域名即可对接
-
-| 渠道 | 链接 |
+| 渠道 | 地址 |
 |---|---|
-| Release 主页 | https://github.com/shuji-chu/Lynli-Release/releases |
-| 最新 APK（通用） | https://github.com/shuji-chu/Lynli-Release/releases/latest/download/Lynli.apk |
-| 国内加速 | https://dl.yisoujiasu.de5.net/v0.7.11/Lynli.apk |
+| Release | https://github.com/shuji-chu/Lynli-Release/releases |
+| 最新版 | https://github.com/shuji-chu/Lynli-Release/releases/latest/download/Lynli.apk |
 
-## 🎁 官方社群
+## 社群
 
-| 社群 | 链接 | 说明 |
+| 渠道 | 地址 | 说明 |
 |---|---|---|
-| 签到群 | https://m.mivra.im/SOCKS5 | 每天签到领 1-3 GB 流量 |
-| 搜索引擎群 | https://m.mivra.im/ys888 | 产品交流 / 技术讨论 |
-| TG 签到群 | https://t.me/qingtian_vip | Telegram 签到 / 交流 |
-| Issues | https://github.com/shuji-chu/Lynli-Panel/issues | 提 bug / 建议 |
+| 签到群 | https://m.mivra.im/SOCKS5 | 每日签到领取流量 |
+| 交流群 | https://m.mivra.im/ys888 | 产品交流 · 技术讨论 |
+| Telegram | https://t.me/qingtian_vip | 签到 / 交流 |
+| Issues | https://github.com/shuji-chu/Lynli-Panel/issues | Bug 反馈 · 建议 |
 
-> 注：以上链接是官方演示实例。**自己部署时，把这两个链接换成你自己的。**
+以上为官方演示实例。自行部署时请替换为你自己的社群链接。
 
 ## 交流与反馈
 
-- 使用中遇到问题 → 提 [Issue](https://github.com/shuji-chu/Lynli-Panel/issues)
-- 想改代码 → 直接 fork + PR
-- 想聊技术 / 找同类项目 → 邮箱 `lynli@qingtian.kz.ci`
+- 遇到问题 → 提交 [Issue](https://github.com/shuji-chu/Lynli-Panel/issues)
+- 想改代码 → Fork + PR
+- 技术交流 → lynli@qingtian.kz.ci
 
-这个项目还在早期，功能可能有疏漏，代码风格也谈不上优雅。**把它当成一个学习样本，而不是成熟产品**。
+## 许可
+
+本项目基于 AGPL-3.0 许可发布，详见 [LICENSE](LICENSE)。
+
+任何人可自由使用、修改、分发，修改后须在相同许可下开源。
 
 ## 免责声明
 
-本项目仅用于技术学习与交流，使用者需自行承担所有法律责任。禁止用于任何违法用途。
+本项目仅用于技术学习与交流，使用者须自行承担所有法律责任。禁止用于任何违法用途。
