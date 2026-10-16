@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import os, time, json, base64, secrets
+import config
 import bots_bridge
 
 UPLOAD_DIR = "/opt/lynli-api/uploads"
@@ -47,7 +48,6 @@ def handle(ctx):
         fn = secrets.token_hex(12) + ext
         with open(os.path.join(UPLOAD_DIR, fn), "wb") as f:
             f.write(raw)
-        import config
         url = config.get("base_url", "").rstrip("/") + "/uploads/" + fn
         ctx["send"]({"code": 1, "data": {"url": url}}); return True
 

@@ -1,4 +1,5 @@
 import db
+import config
 
 
 def _load_settings(c):
@@ -41,7 +42,6 @@ def handle(ctx):
     if _host and _host not in ("127.0.0.1", "localhost"):
         base = "https://" + _host
     else:
-        import config
         base = config.get("base_url", "https://localhost")
     kefu = s.get("kefu_url", "https://t.me/")
     tg = s.get("telegram_url", "https://t.me/")
@@ -61,6 +61,9 @@ def handle(ctx):
         "kefuurl": kefu,
         "websiteURL": site,
         "appDownloadUrl": dl,
+        "mivraUrl": s.get("mivra_url", ""),
+        "mivraurl": s.get("mivra_url", ""),
+        "mivraGuide": s.get("mivra_guide", ""),
         "siteName": s.get("site_name", "Lynli"),
         "registerOpen": 1 if s.get("register_open", "1") == "1" else 0,
         "maintenance": 1 if s.get("maintenance", "0") == "1" else 0,

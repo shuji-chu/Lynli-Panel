@@ -1,4 +1,5 @@
 import time, secrets, hashlib, random, json
+import config
 import db
 
 _admin_tokens = {}   # token -> {"id":..,"email":..,"role":..,"expire":..}

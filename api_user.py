@@ -1,4 +1,5 @@
 import time, db
+import config
 
 def handle(ctx):
     p = ctx["path"]
@@ -36,7 +37,6 @@ def handle(ctx):
         NODE_NAME = _name
         NODE_HOST = _domain if _domain else _ip
         NODE_PORT = 443
-        import config
         NODE_PASS = config.get("hy2_password", "")
         NODE_SNI = config.get("hy2_sni", "www.bing.com")
         NODE_OBFS = "salamander"

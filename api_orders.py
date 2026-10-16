@@ -1,4 +1,5 @@
 import time, secrets, db
+import config
 
 PRICE_FIELD = {"month_price": "month_price", "quarter_price": "quarter_price",
                "half_year_price": "half_year_price", "year_price": "year_price"}
