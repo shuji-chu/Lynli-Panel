@@ -1,6 +1,9 @@
 # Lynli Panel
 
-> 轻量的 VPN/代理管理面板。Python + SQLite 后端，纯 HTML/JS 前端，支持 Clash / V2Ray / sing-box 多格式订阅。
+> 轻量 VPN/代理管理面板。Python + SQLite 后端，纯 HTML/JS 前端，支持 Clash / V2Ray / sing-box 多格式订阅。
+>
+> **这是一个个人学习项目**。我在练习 Python 后端和原生前端的过程中写了它，跑起来能用，但**不保证生产级稳定**。欢迎交流、指正、提 PR。
+> 如果你也在做类似的东西，或者对代码有任何想法，**Issues 和 PR 都欢迎**。
 
 ## 功能
 
@@ -156,6 +159,14 @@ admin/ 目录是纯静态页面，扔到 Nginx / Vercel / Cloudflare Pages 都�
 AGPL-3.0（详见 LICENSE）
 
 任何人可以自由使用、修改、分发，但修改后必须在相同许可下开源。
+
+## 交流与反馈
+
+- 使用中遇到问题 → 提 [Issue](https://github.com/shuji-chu/Lynli-Panel/issues)
+- 想改代码 → 直接 fork + PR
+- 想聊技术 / 找同类项目 → 邮箱 `lynli@qingtian.kz.ci`
+
+这个项目还在早期，功能可能有疏漏，代码风格也谈不上优雅。**把它当成一个学习样本，而不是成熟产品**。
 
 ## 免责声明
 
