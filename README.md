@@ -192,8 +192,9 @@ Lynli 有配套的 Android 客户端（基于 CMFA 修改）：
 
 | 渠道 | 链接 |
 |---|---|
-| Release | https://github.com/shuji-chu/Lynli-Release/releases |
-| 最新 APK | https://dl.yisoujiasu.de5.net/v0.7.9/Lynli.apk |
+| Release 主页 | https://github.com/shuji-chu/Lynli-Release/releases |
+| 最新 APK（通用） | https://github.com/shuji-chu/Lynli-Release/releases/latest/download/Lynli.apk |
+| 国内加速 | https://dl.yisoujiasu.de5.net/v0.7.11/Lynli.apk |
 
 ## 🎁 官方社群
 
