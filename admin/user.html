@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>用户详情 · Lynli</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.ud-page { padding: 14px 14px 90px; }
+.ud-back { font-size: 13px; color: #888; margin-bottom: 12px; cursor: pointer; }
+.ud-card { background: #fff; border: 1px solid #eaeaea; border-radius: 14px; padding: 16px; margin-bottom: 12px; }
+.ud-head { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.ud-avatar { width: 52px; height: 52px; border-radius: 26px; background: #2E5BFF; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; flex-shrink: 0; }
+.ud-head-info { flex: 1; min-width: 0; }
+.ud-nick { font-size: 17px; font-weight: 700; color: #111; word-break: break-all; }
+.ud-email { font-size: 12px; color: #888; margin-top: 2px; word-break: break-all; }
+.ud-tag { font-size: 11px; padding: 3px 9px; border-radius: 10px; font-weight: 600; }
+.ud-tag.active { background: #e8f6ee; color: #0a9f52; }
+.ud-tag.expired, .ud-tag.banned { background: #ffefef; color: #e74c3c; }
+.ud-tag.none { background: #f5f5f5; color: #888; }
+.ud-row { display: flex; justify-content: space-between; padding: 9px 0; font-size: 13px; border-bottom: 1px solid #f5f5f5; gap: 10px; }
+.ud-row:last-child { border-bottom: none; }
+.ud-k { color: #888; flex-shrink: 0; }
+.ud-v { color: #111; font-weight: 500; text-align: right; word-break: break-all; }
+.ud-copy { color: #2E5BFF; cursor: pointer; }
+.ud-sec-title { font-size: 12px; font-weight: 600; color: #888; margin-bottom: 8px; letter-spacing: .5px; }
+.ud-op-row { display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+.ud-btn { flex: 1; min-width: 72px; padding: 12px 8px; border: 1px solid #eaeaea; border-radius: 10px; background: #fff; font-size: 13px; color: #333; font-weight: 500; cursor: pointer; font-family: inherit; }
+.ud-btn:active { background: #f5f5f5; }
+.ud-btn.primary { background: #2E5BFF; color: #fff; border-color: #2E5BFF; }
+.ud-btn.warn { color: #d97706; border-color: #ffe0b3; }
+.ud-btn.danger { color: #e74c3c; border-color: #ffd5d5; background: #fff5f5; }
+.ud-input { width: 100%; box-sizing: border-box; padding: 11px 13px; border: 1px solid #eaeaea; border-radius: 10px; font-size: 14px; margin: 6px 0 4px; font-family: inherit; }
+.ud-select { width: 100%; box-sizing: border-box; padding: 11px 13px; border: 1px solid #eaeaea; border-radius: 10px; font-size: 14px; margin: 6px 0 4px; background: #fff; font-family: inherit; }
+.ud-label { font-size: 12px; color: #888; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="topbar" id="topbar"></div>
+  <div class="ud-page">
+    <div class="ud-back" onclick="location.href='users.html'">← 返回用户列表</div>
+    <div id="content"><div style="text-align:center;color:#888;padding:40px 0">加载中...</div></div>
+  </div>
+  <nav class="tabs-bottom" id="tabs"></nav>
+</div>
+<div id="modal"></div>
+<script src="app.js"></script>
+<script src="user.js"></script>
+</body>
+</html>

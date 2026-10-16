@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://lynli.abrdns.com/api/:path*"
+    },
+    {
+      "source": "/uploads/:path*",
+      "destination": "https://lynli.abrdns.com/uploads/:path*"
+    }
+  ]
+}

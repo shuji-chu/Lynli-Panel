@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hysteria2 · Lynli</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.hy-card { background:#fff; border:1px solid #eaeaea; border-radius:14px; padding:16px; margin-bottom:16px; }
+.hy-row { display:flex; justify-content:space-between; padding:9px 0; font-size:14px; border-bottom:1px solid #f5f5f5; }
+.hy-row:last-child { border-bottom:none; }
+.hy-k { color:#888; }
+.hy-v { color:#111; font-weight:500; }
+.hy-btn { width:100%; padding:13px; border:1px solid #eaeaea; border-radius:10px; background:#fff; font-size:14px; color:#111; font-weight:600; margin-top:8px; }
+.hy-btn.primary { background:#2E5BFF; color:#fff; border-color:#2E5BFF; }
+.hy-btn.warn { background:#fff5f5; color:#e74c3c; border-color:#ffd5d5; }
+.hy-input { width:100%; box-sizing:border-box; padding:12px 14px; border:1px solid #eaeaea; border-radius:10px; font-size:14px; margin:6px 0 4px; }
+.hy-label { font-size:12px; color:#888; font-weight:600; margin-top:12px; display:block; }
+.hy-status { display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:12px; font-size:12px; }
+.hy-on { background:#e8f6ee; color:#0a9f52; }
+.hy-off { background:#ffefef; color:#e74c3c; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="topbar" id="topbar"></div>
+  <div class="content" style="padding:16px">
+    <div style="font-size:13px;color:#888;margin-bottom:12px" onclick="location.href='nodes.html'">← 返回节点</div>
+    <div class="hy-card" id="info">
+      <div style="text-align:center;color:#888;padding:20px 0">加载中...</div>
+    </div>
+
+    <div class="hy-card">
+      <div style="font-weight:600;margin-bottom:6px">服务操作</div>
+      <button class="hy-btn primary" onclick="hyAction('restart', {})">重启服务</button>
+    </div>
+
+    <div class="hy-card">
+      <div style="font-weight:600;margin-bottom:6px">修改连接密码</div>
+      <div style="font-size:11px;color:#888">改后所有用户需重新导入订阅</div>
+      <input id="pw" class="hy-input" placeholder="新的连接密码">
+      <button class="hy-btn warn" onclick="hyPw()">保存密码并重启</button>
+    </div>
+
+    <div class="hy-card">
+      <div style="font-weight:600;margin-bottom:6px">修改混淆密码</div>
+      <div style="font-size:11px;color:#888">改后所有用户需重新导入订阅</div>
+      <input id="obfs" class="hy-input" placeholder="新的混淆密码">
+      <button class="hy-btn warn" onclick="hyObfs()">保存混淆并重启</button>
+    </div>
+  </div>
+  <nav class="tabs-bottom" id="tabs"></nav>
+</div>
+<script src="app.js"></script>
+<script>
+if (!checkAuth()) throw 0;
+renderShell('home');
+
+async function loadInfo() {
+  var j = await api('/nodes/hysteria');
+  var d = (j.code === 1) ? (j.data || {}) : {};
+  var status = d.alive
+    ? '<span class="hy-status hy-on">● 在线</span>'
+    : '<span class="hy-status hy-off">● 停用</span>';
+  document.getElementById('info').innerHTML =
+    '<div style="font-size:16px;font-weight:700;margin-bottom:10px">易搜加速·美西 (Hysteria2)</div>' +
+    '<div class="hy-row"><div class="hy-k">状态</div><div class="hy-v">' + status + '</div></div>' +
+    '<div class="hy-row"><div class="hy-k">服务地址</div><div class="hy-v">' + (d.server||'') + ':' + (d.port||443) + '</div></div>' +
+    '<div class="hy-row"><div class="hy-k">协议</div><div class="hy-v">hysteria2 · ' + (d.obfs||'salamander') + '</div></div>' +
+    '<div class="hy-row"><div class="hy-k">在线连接</div><div class="hy-v">' + (d.connections||0) + '</div></div>';
+}
+
+async function hyAction(action, body) {
+  toast('处理中...');
+  var j = await api('/nodes/hysteria/' + action, {method:'POST', body: JSON.stringify(body||{})});
+  if (j.code === 1) { toast(j.msg||'操作成功'); setTimeout(loadInfo, 1000); }
+  else { toast('失败：' + (j.msg||'')); }
+}
+
+function hyPw() {
+  var v = document.getElementById('pw').value.trim();
+  if (!v) { toast('请输入新密码'); return; }
+  if (!confirm('确定要修改连接密码？所有用户需重新导入订阅')) return;
+  hyAction('set_password', {password: v});
+}
+
+function hyObfs() {
+  var v = document.getElementById('obfs').value.trim();
+  if (!v) { toast('请输入新混淆密码'); return; }
+  if (!confirm('确定要修改混淆密码？所有用户需重新导入订阅')) return;
+  hyAction('set_obfs', {obfs: v});
+}
+
+loadInfo();
+</script>
+</body>
+</html>

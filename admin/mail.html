@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>邮件 · Lynli</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.mg-tabs{display:flex;background:#fff;border:1px solid #eaeaea;border-radius:10px;padding:4px;margin-bottom:14px}
+.mg-tabs .mt{flex:1;text-align:center;padding:9px 0;font-size:14px;color:#666;border-radius:8px;cursor:pointer}
+.mg-tabs .mt.on{background:#2E5BFF;color:#fff;font-weight:600}
+.mg-card{background:#fff;border:1px solid #eaeaea;border-radius:14px;padding:16px;margin-bottom:14px}
+.mg-card h3{margin:0 0 12px;font-size:14px;color:#0F1A3C}
+.mg-row{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.mg-row label{font-size:12px;color:#64748B}
+.mg-row input,.mg-row select,.mg-row textarea{width:100%;padding:11px 13px;border:1px solid #eaeaea;border-radius:10px;font-size:14px;font-family:inherit;box-sizing:border-box;outline:none}
+.mg-row textarea{min-height:180px;resize:vertical;font-family:ui-monospace,Menlo,monospace;font-size:13px}
+.mg-btn{width:100%;padding:14px;background:#2E5BFF;color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:600}
+.mg-btn:active{opacity:.85}
+.mg-hint{font-size:12px;color:#94A3B8;margin-top:8px;line-height:1.6}
+.tpl-item{background:#fff;border:1px solid #eaeaea;border-radius:12px;padding:14px;margin-bottom:10px}
+.tpl-row1{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.tpl-name{font-size:15px;font-weight:600;color:#0F1A3C}
+.tpl-key{font-size:11px;color:#94A3B8;font-family:monospace}
+.tpl-subj{font-size:13px;color:#475569;margin-bottom:10px}
+.tpl-actions{display:flex;gap:8px}
+.tpl-btn{flex:1;padding:9px;border:1px solid #eaeaea;border-radius:8px;background:#fff;font-size:13px;cursor:pointer}
+.tpl-btn.use{background:#eef4ff;color:#2E5BFF;border-color:#d5e0ff;font-weight:600}
+.tpl-btn.del{background:#fff5f5;color:#e74c3c;border-color:#ffd5d5}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="topbar" id="topbar"></div>
+  <div class="dash" style="padding-bottom:20px">
+    <div class="mg-tabs">
+      <div class="mt on" onclick="switchTab('send')">群发</div>
+      <div class="mt" onclick="switchTab('tpl')">模板库</div>
+    </div>
+
+    <div id="tabSend">
+      <div class="mg-card"><h3>收件人</h3><div class="mg-row"><select id="target"><option value="all">全部用户</option><option value="paid">付费用户</option><option value="expiring">7 天内到期</option></select></div></div>
+      <div class="mg-card"><h3>内容</h3>
+        <div class="mg-row"><label>主题</label><input id="subject" placeholder="如：易搜加速 双十一 5 折"></div>
+        <div class="mg-row"><label>HTML 正文</label><textarea id="body" placeholder="<h2>Hi，</h2>&#10;<p>...</p>"></textarea></div>
+      </div>
+      <button class="mg-btn" onclick="sendMail()">立即群发</button>
+      <div class="mg-hint">⚠️ 邮件会异步逐条发送（0.3 秒/封），不会阻塞。SMTP 有日限额时请分批。</div>
+    </div>
+
+    <div id="tabTpl" style="display:none">
+      <div id="tplList"></div>
+      <button class="mg-btn" style="margin-top:8px" onclick="openTplEditor(null)">+ 新建模板</button>
+    </div>
+  </div>
+  <nav class="tabs-bottom" id="tabs"></nav>
+</div>
+<div id="modal"></div>
+<script src="app.js"></script>
+<script src="mail.js"></script>
+</body>
+</html>

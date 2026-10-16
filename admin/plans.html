@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>套餐 · Lynli</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <div class="topbar" id="topbar"></div>
+  <div class="content">
+    <div class="plans-filter">
+      <div class="pf on" data-f="all" onclick="setFilter('all')">全部 <span class="c">0</span></div>
+      <div class="pf" data-f="monthly" onclick="setFilter('monthly')">包月 <span class="c">0</span></div>
+      <div class="pf" data-f="onetime" onclick="setFilter('onetime')">一次性 <span class="c">0</span></div>
+    </div>
+    <div id="planList"></div>
+  </div>
+  <button class="fab" onclick="editPlan(null)">＋</button>
+  <nav class="tabs-bottom" id="tabs"></nav>
+</div>
+<div id="modal"></div>
+<script src="app.js"></script>
+<script src="plans.js"></script>
+</body>
+</html>

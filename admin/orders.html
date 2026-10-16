@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>订单 · Lynli</title>
+<link rel="stylesheet" href="style.css">
+<style>.search-tag { display: inline-flex; align-items: center; gap: 6px; background: #eef4ff; color: #1a73e8; padding: 6px 12px; border-radius: 20px; font-size: 12px; margin-bottom: 14px; }
+.search-tag .x { margin-left: 6px; font-size: 14px; cursor: pointer; opacity: .6; }
+.search-tag .x:active { opacity: 1; }
+</style><style>.ord-actions { display: flex; gap: 8px; margin-top: 12px; padding-top: 10px; border-top: 1px solid #f5f5f5; }
+.ord-actions button { flex: 1; padding: 8px; border: none; border-radius: 8px; font-size: 12px; font-weight: 500; }
+.oa-pay { background: #000; color: #fff; }
+.oa-refund { background: #fff; color: #d97706; border: 1px solid #ffe0b3; }
+.oa-cancel { background: #f5f5f5; color: #666; }
+</style></head>
+<body>
+<div id="app">
+  <div class="topbar" id="topbar"></div>
+  <div class="content" id="content"></div>
+  <nav class="tabs-bottom" id="tabs"></nav>
+</div>
+<script src="app.js"></script>
+<script src="orders.js"></script>
+</body>
+</html>

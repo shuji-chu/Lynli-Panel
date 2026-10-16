@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>个人设置 · Lynli</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.ps-wrap { padding: 14px 14px 90px; }
+.ps-card { background: #fff; border: 1px solid #eaeaea; border-radius: 14px; padding: 20px; margin-bottom: 16px; }
+.ps-avatar { width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg,#1a73e8,#0a9f52); color: #fff; font-size: 26px; font-weight: 700; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; }
+.ps-name { text-align: center; font-size: 18px; font-weight: 600; color: #000; margin-bottom: 4px; }
+.ps-role { text-align: center; font-size: 12px; color: #888; margin-bottom: 20px; }
+.ps-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f5f5f5; font-size: 13px; }
+.ps-row:last-child { border-bottom: none; }
+.ps-k { color: #888; }
+.ps-v { color: #000; font-weight: 500; }
+.ps-btn { width: 100%; padding: 13px; background: #000; color: #fff; border: none; border-radius: 10px; font-size: 14px; font-weight: 500; margin-top: 8px; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="topbar" id="topbar"></div>
+  <div class="ps-wrap">
+    <div class="ps-card">
+      <div class="ps-avatar" id="avatar">超</div>
+      <div class="ps-name" id="pname">—</div>
+      <div class="ps-role" id="prole">—</div>
+    </div>
+
+    <div class="ps-card">
+      <div class="ps-row"><div class="ps-k">邮箱</div><div class="ps-v" id="pemail">—</div></div>
+      <div class="ps-row"><div class="ps-k">角色</div><div class="ps-v" id="prole2">—</div></div>
+      <div class="ps-row"><div class="ps-k">登录时间</div><div class="ps-v" id="plogin">—</div></div>
+    </div>
+
+    <div class="ps-card">
+      <label style="display:block;font-size:13px;color:#666;margin-bottom:6px">昵称</label>
+      <input id="n_name" style="width:100%;padding:10px 12px;border:1px solid #eaeaea;border-radius:8px;font-size:14px;margin-bottom:12px">
+      <button class="ps-btn" onclick="saveName()">保存昵称</button>
+    </div>
+
+    <div class="ps-card">
+      <label style="display:block;font-size:13px;color:#666;margin-bottom:6px">原密码</label>
+      <input id="n_old" type="password" style="width:100%;padding:10px 12px;border:1px solid #eaeaea;border-radius:8px;font-size:14px;margin-bottom:12px">
+      <label style="display:block;font-size:13px;color:#666;margin-bottom:6px">新密码</label>
+      <input id="n_pw" type="password" style="width:100%;padding:10px 12px;border:1px solid #eaeaea;border-radius:8px;font-size:14px;margin-bottom:12px">
+      <label style="display:block;font-size:13px;color:#666;margin-bottom:6px">确认新密码</label>
+      <input id="n_pw2" type="password" style="width:100%;padding:10px 12px;border:1px solid #eaeaea;border-radius:8px;font-size:14px;margin-bottom:12px">
+      <button class="ps-btn" onclick="savePassword()">修改密码</button>
+    </div>
+  </div>
+  <nav class="tabs-bottom" id="tabs"></nav>
+</div>
+<script src="app.js"></script>
+<script src="personal.js"></script>
+</body>
+</html>

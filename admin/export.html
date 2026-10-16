@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>报表导出 · Lynli</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.exp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-top:16px}
+.exp-card{background:#fff;border:1px solid #eaeaea;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:8px}
+.exp-card .name{font-size:15px;font-weight:600;color:#0F1A3C}
+.exp-card .desc{font-size:12px;color:#94A3B8;line-height:1.5}
+.exp-card button{margin-top:auto;padding:10px 0;background:#2E5BFF;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:500;cursor:pointer}
+.exp-card button:active{opacity:.85}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="topbar" id="topbar"></div>
+  <div class="dash">
+    <div class="sec-title">审计报表</div>
+    <div style="font-size:12px;color:#94A3B8;margin-top:-6px;margin-bottom:4px">导出 CSV，Excel / Numbers 直接打开</div>
+    <div id="grid" class="exp-grid"></div>
+  </div>
+  <nav class="tabs-bottom" id="tabs"></nav>
+</div>
+<script src="app.js"></script>
+<script src="export.js"></script>
+</body>
+</html>

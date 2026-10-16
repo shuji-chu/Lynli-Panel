@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>首页 · Lynli</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.ad-sec { margin-bottom: 22px; }
+.ad-sec-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.ad-sec-title { font-size: 13px; font-weight: 600; color: #666; letter-spacing: .5px; }
+.ad-sec-more { font-size: 12px; color: #1a73e8; }
+.ad-box { position: relative; width: 100%; aspect-ratio: 328/180; border-radius: 14px; overflow: hidden; background: #000; box-shadow: 0 2px 12px rgba(0,0,0,.08); }
+.ad-media { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .5s; }
+.ad-media.on { opacity: 1; }
+.ad-box .ad-empty { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #bbb; font-size: 13px; gap: 6px; background: #f5f5f5; }
+.ad-cap { position: absolute; bottom: 0; left: 0; right: 0; padding: 24px 14px 12px; background: linear-gradient(transparent, rgba(0,0,0,.75)); color: #fff; opacity: 0; transition: opacity .4s; pointer-events: none; }
+.ad-cap.on { opacity: 1; }
+.ad-cap .t { font-size: 15px; font-weight: 600; }
+.ad-cap .s { font-size: 12px; opacity: .9; margin-top: 3px; }
+.ad-dots { display: flex; justify-content: center; gap: 6px; margin-top: 10px; }
+.ad-dots .d { width: 6px; height: 6px; border-radius: 50%; background: #ddd; transition: .25s; cursor: pointer; }
+.ad-dots .d.on { background: #1a73e8; width: 18px; border-radius: 3px; }
+</style>
+<style>
+.todo-box { background: linear-gradient(135deg, #fff8e8, #fff); border: 1px solid #ffe0b3; border-radius: 14px; padding: 14px; margin-bottom: 18px; }
+.todo-head { font-size: 13px; font-weight: 600; color: #d97706; margin-bottom: 10px; }
+.todo-list { display: flex; flex-direction: column; gap: 8px; }
+.todo-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; background: #fff; border-radius: 10px; font-size: 13px; cursor: pointer; }
+.todo-item:active { background: #fafafa; }
+.todo-item .num { display: inline-flex; min-width: 22px; height: 22px; padding: 0 8px; align-items: center; justify-content: center; background: #e74c3c; color: #fff; border-radius: 11px; font-size: 12px; font-weight: 600; }
+</style><style>
+.chart-card { background: #fff; border: 1px solid #eaeaea; border-radius: 14px; padding: 16px; margin-bottom: 22px; }
+.chart-tabs { display: flex; background: #f5f5f5; border-radius: 8px; padding: 3px; margin-bottom: 16px; }
+.chart-tabs .ct { flex: 1; text-align: center; padding: 7px 0; font-size: 13px; color: #666; border-radius: 6px; cursor: pointer; }
+.chart-tabs .ct.on { background: #fff; color: #000; font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+.trend-chart { display: flex; align-items: flex-end; gap: 3px; height: 100px; padding: 8px 0; overflow-x: auto; }
+.trend-chart::-webkit-scrollbar { display: none; }
+.trend-chart .bar { flex-shrink: 0; width: 8px; background: linear-gradient(180deg, #4dabf7, #1a73e8); border-radius: 3px 3px 0 0; min-height: 6px; transition: .2s; }
+.trend-chart .bar:hover { background: linear-gradient(180deg, #ffd43b, #f59f00); }
+.chart-sum { display: flex; justify-content: space-around; padding-top: 12px; border-top: 1px solid #f5f5f5; font-size: 12px; }
+.chart-sum .it { text-align: center; }
+.chart-sum .it .k { color: #888; margin-bottom: 3px; }
+.chart-sum .it .v { color: #000; font-weight: 700; font-size: 16px; }
+</style></head>
+<body>
+<div id="app">
+  <div class="topbar" id="topbar"></div>
+
+  <div class="dash">
+    <div class="dash-search">
+      <input id="kw" placeholder="搜用户邮箱 / 订单号 / 邀请码">
+      <button class="new-btn" onclick="go('banners.html')">+ 发广告</button>
+    </div>
+
+    <div id="todoBox"></div>
+    <div id="adPreview"></div>
+
+    <div class="sec-title">近 30 天趋势</div>
+    <div class="chart-card">
+      <div class="chart-tabs">
+        <div class="ct on" data-k="income" onclick="switchChart('income')">收入</div>
+        <div class="ct" data-k="users" onclick="switchChart('users')">新用户</div>
+        <div class="ct" data-k="orders" onclick="switchChart('orders')">订单</div>
+      </div>
+      <div id="trendChart" class="trend-chart"></div>
+      <div class="chart-sum" id="chartSum"></div>
+    </div>
+
+    <div class="sec-title">深度指标</div>
+    <div class="stat-grid" id="deepGrid"></div>
+
+    <div class="sec-title">数据概览</div>
+    <div class="stat-grid" id="statGrid"></div>
+
+    <div class="sec-title">今日收入 <span class="tag-mini" id="todayDate"></span></div>
+    <div class="pay-card">
+      <div class="pay-row" onclick="go('orders.html?pay=usdt')">
+        <div class="l"><span class="tag-mini tag-usdt">USDT</span> 今日 USDT</div>
+        <div class="r" id="todayUsdt">—</div>
+      </div>
+      <div class="pay-row" onclick="go('orders.html?pay=alipay')">
+        <div class="l"><span class="tag-mini tag-alipay">支付宝</span> 今日支付宝</div>
+        <div class="r" id="todayAlipay">—</div>
+      </div>
+      <div class="pay-row total">
+        <div class="l">今日合计</div>
+        <div class="r" id="todayTotal">—</div>
+      </div>
+    </div>
+
+    <div class="sec-title">累计收入</div>
+    <div class="pay-card">
+      <div class="pay-row" onclick="go('orders.html?pay=usdt')">
+        <div class="l"><span class="tag-mini tag-usdt">USDT</span> 累计 USDT</div>
+        <div class="r" id="allUsdt">—</div>
+      </div>
+      <div class="pay-row" onclick="go('orders.html?pay=alipay')">
+        <div class="l"><span class="tag-mini tag-alipay">支付宝</span> 累计支付宝</div>
+        <div class="r" id="allAlipay">—</div>
+      </div>
+    </div>
+  </div>
+
+  <nav class="tabs-bottom" id="tabs"></nav>
+</div>
+
+<script src="app.js"></script>
+<script src="home.js"></script>
+</body>
+</html>

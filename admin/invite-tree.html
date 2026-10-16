@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>邀请树 · Lynli</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.tree{padding:0 0 90px}
+.tnode{background:#fff;border:1px solid #eaeaea;border-radius:12px;padding:12px 14px;margin:8px 0;display:flex;align-items:center;gap:10px;cursor:pointer}
+.tnode:active{background:#fafbff}
+.tnode .av{width:36px;height:36px;border-radius:18px;background:#2E5BFF;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0}
+.tnode .info{flex:1;min-width:0}
+.tnode .nm{font-size:14px;font-weight:600;color:#0F1A3C}
+.tnode .sub{font-size:11px;color:#94A3B8;margin-top:2px}
+.tnode .cm{font-size:12px;color:#16a34a;font-weight:600;flex-shrink:0}
+.tchildren{padding-left:20px;border-left:2px dashed #E2E8F0;margin-left:6px}
+.tempty{text-align:center;color:#94A3B8;padding:40px 20px;font-size:13px}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="topbar" id="topbar"></div>
+  <div class="dash"><div id="tree" class="tree"><div class="tempty">加载中…</div></div></div>
+  <nav class="tabs-bottom" id="tabs"></nav>
+</div>
+<script src="app.js"></script>
+<script src="invite-tree.js"></script>
+</body>
+</html>

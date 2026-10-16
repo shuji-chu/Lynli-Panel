@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>机器人用户 · Lynli</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.bu-wrap { padding: 14px 14px 90px; }
+.bu-summary { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+.bu-sum-card { background: #fff; border: 1px solid #eaeaea; border-radius: 12px; padding: 14px 12px; }
+.bu-sum-card .k { font-size: 11px; color: #888; margin-bottom: 6px; display: flex; align-items: center; gap: 5px; }
+.bu-sum-card .v { font-size: 22px; font-weight: 700; color: #000; }
+.bu-sum-card .v.g { color: #0a9f52; }
+.bu-sum-card .v.b { color: #1a73e8; }
+.bu-toolbar { display: flex; gap: 8px; margin-bottom: 12px; }
+.bu-toolbar input { flex: 1; padding: 11px 14px; border: 1px solid #eaeaea; border-radius: 10px; font-size: 14px; background: #fff; outline: none; }
+.bu-toolbar input:focus { border-color: #000; }
+.bu-user { background: #fff; border: 1px solid #eaeaea; border-radius: 12px; padding: 14px; margin-bottom: 10px; cursor: pointer; }
+.bu-user:active { background: #fafafa; }
+.bu-user.banned { opacity: .55; }
+.bu-user-row1 { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.bu-user-name { font-size: 15px; font-weight: 600; color: #000; }
+.bu-user-id { font-size: 11px; color: #999; margin-top: 2px; font-family: ui-monospace, Menlo, monospace; }
+.bu-tag { font-size: 11px; padding: 3px 8px; border-radius: 6px; }
+.bu-tag.active { background: #e8f8ef; color: #0a9f52; }
+.bu-tag.expired { background: #ffeaea; color: #e74c3c; }
+.bu-tag.none { background: #f2f2f2; color: #888; }
+.bu-tag.banned { background: #ffeaea; color: #e74c3c; }
+.bu-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; font-size: 12px; }
+.bu-stats .k { color: #aaa; font-size: 11px; margin-bottom: 3px; }
+.bu-stats .v { color: #333; font-weight: 600; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="topbar" id="topbar"></div>
+  <div class="bu-wrap">
+    <div id="summary"></div>
+    <div class="bu-toolbar">
+      <input id="kw" placeholder="搜昵称 / 数字 ID">
+    </div>
+    <div id="userList"></div>
+  </div>
+  <nav class="tabs-bottom" id="tabs"></nav>
+</div>
+<div id="modal"></div>
+<script src="app.js"></script>
+<script src="bots-users.js"></script>
+</body>
+</html>

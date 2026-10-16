@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>节点管理 · Lynli</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.n-card { background:#fff; border:1px solid #eaeaea; border-radius:14px; padding:16px; margin-bottom:14px; }
+.n-row { display:flex; justify-content:space-between; padding:8px 0; font-size:13px; border-bottom:1px solid #f5f5f5; }
+.n-row:last-child { border-bottom:none; }
+.n-k { color:#888; } .n-v { color:#111; font-weight:500; }
+.cl-item { display:flex; justify-content:space-between; align-items:center; padding:11px 0; border-bottom:1px solid #f5f5f5; font-size:13px; }
+.cl-email { color:#111; font-weight:500; }
+.cl-info { font-size:11px; color:#888; margin-top:2px; }
+.cl-del { padding:6px 12px; border:1px solid #ffd5d5; background:#fff5f5; color:#e74c3c; border-radius:8px; font-size:12px; }
+.n-btn { width:100%; padding:13px; border:1px solid #eaeaea; border-radius:10px; background:#fff; font-size:14px; color:#111; font-weight:600; margin-top:8px; }
+.n-btn.primary { background:#2E5BFF; color:#fff; border-color:#2E5BFF; }
+.n-input { width:100%; box-sizing:border-box; padding:12px 14px; border:1px solid #eaeaea; border-radius:10px; font-size:14px; margin:6px 0 4px; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="topbar" id="topbar"></div>
+  <div class="content" style="padding:16px">
+    <div style="font-size:13px;color:#888;margin-bottom:12px" onclick="location.href='nodes.html'">← 返回节点</div>
+    <div class="n-card" id="head"><div style="text-align:center;color:#888;padding:20px 0">加载中...</div></div>
+    <div class="n-card">
+      <div style="font-weight:600;margin-bottom:10px">客户端列表</div>
+      <div id="clients"><div style="color:#888;text-align:center;padding:20px 0">加载中...</div></div>
+    </div>
+    <div class="n-card">
+      <div style="font-weight:600;margin-bottom:6px">新增客户端</div>
+      <input id="ac_email" class="n-input" placeholder="邮箱（如 user3@lynli.com）">
+      <input id="ac_days" class="n-input" type="number" value="30" placeholder="时长（天）">
+      <button class="n-btn primary" onclick="addCli()">添加客户端</button>
+    </div>
+  </div>
+  <nav class="tabs-bottom" id="tabs"></nav>
+</div>
+<div id="modal"></div>
+<script src="app.js"></script>
+<script>
+if (!checkAuth()) throw 0;
+renderShell('home');
+
+var Q = new URLSearchParams(location.search);
+var NID = Q.get('id') || '';
+var NNAME = decodeURIComponent(Q.get('name') || ('节点 #' + NID));
+
+function fmtSize2(b){ if(!b) return '0 B'; var k=1024,u=['B','KB','MB','GB','TB'],i=0; while(b>=k&&i<u.length-1){b/=k;i++;} return b.toFixed(2)+u[i]; }
+function fmtDate2(t){ if(!t) return '永久'; var d=new Date(t); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+
+async function loadHead() {
+  var j = await api('/nodes');
+  var list = (j.code === 1) ? (j.data || []) : [];
+  var n = null;
+  for (var i=0;i<list.length;i++){ if (String(list[i].id) === String(NID)) { n = list[i]; break; } }
+  if (!n) n = {};
+  document.getElementById('head').innerHTML =
+    '<div style="font-size:16px;font-weight:700;margin-bottom:10px">' + NNAME +
+    '<span style="font-size:11px;color:#1a73e8;background:#eef4ff;padding:2px 8px;border-radius:6px;margin-left:6px">' + (n.protocol||'') + '</span></div>' +
+    '<div class="n-row"><div class="n-k">端口</div><div class="n-v">' + (n.port||'') + '</div></div>' +
+    '<div class="n-row"><div class="n-k">客户端数</div><div class="n-v">' + (n.clients||0) + '</div></div>' +
+    '<div class="n-row"><div class="n-k">在线</div><div class="n-v">' + (n.online||0) + '</div></div>' +
+    '<div class="n-row"><div class="n-k">已用流量</div><div class="n-v">' + fmtSize2((n.up||0)+(n.down||0)) + '</div></div>' +
+    '<div class="n-row"><div class="n-k">状态</div><div class="n-v">' + (n.enable ? '在线' : '停用') + '</div></div>';
+}
+
+async function loadClients() {
+  var j = await api('/nodes/clients?inbound_id=' + NID);
+  var list = (j.code === 1) ? (j.data || []) : [];
+  if (!list.length) { document.getElementById('clients').innerHTML = '<div style="color:#888;text-align:center;padding:20px 0">暂无客户端</div>'; return; }
+  document.getElementById('clients').innerHTML = list.map(function(c){
+    var used = (c.up||0)+(c.down||0);
+    return '<div class="cl-item">' +
+      '<div><div class="cl-email">' + (c.email||'') + (c.online ? ' <span style="color:#0a9f52;font-size:10px">●在线</span>' : '') + '</div>' +
+      '<div class="cl-info">流量 ' + fmtSize2(used) + ' / ' + (c.total ? fmtSize2(c.total) : '不限') + ' · 到期 ' + fmtDate2(c.expiry_time) + '</div></div>' +
+      '<button class="cl-del" onclick="delCli(\'' + (c.email||'') + '\')">删除</button>' +
+    '</div>';
+  }).join('');
+}
+
+async function addCli() {
+  var email = document.getElementById('ac_email').value.trim();
+  var days = parseInt(document.getElementById('ac_days').value) || 30;
+  if (!email) { toast('请输入邮箱'); return; }
+  toast('添加中...');
+  var j = await api('/nodes/add-client', {method:'POST', body: JSON.stringify({inbound_id: NID, email: email, days: days})});
+  if (j.code === 1 && j.data && j.data.ok) { toast('已添加'); document.getElementById('ac_email').value=''; setTimeout(loadClients, 800); }
+  else { toast('失败：' + ((j.data&&j.data.msg)||j.msg||'')); }
+}
+
+async function delCli(email) {
+  if (!confirm('确定删除 ' + email + '？')) return;
+  toast('删除中...');
+  var j = await api('/nodes/del-client', {method:'POST', body: JSON.stringify({inbound_id: NID, email: email})});
+  if (j.code === 1) { toast('已删除'); setTimeout(loadClients, 800); }
+  else { toast('失败：' + (j.msg||'')); }
+}
+
+loadHead();
+loadClients();
+</script>
+</body>
+</html>

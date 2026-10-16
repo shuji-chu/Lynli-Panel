@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>提现审核 · Lynli</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.wd-card { background:#fff; border:1px solid #eaeaea; border-radius:14px; padding:14px; margin-bottom:12px; }
+.wd-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+.wd-email { font-size:14px; font-weight:600; color:#111; }
+.wd-tag { font-size:11px; padding:3px 8px; border-radius:10px; font-weight:600; }
+.wd-pending { background:#fff7e6; color:#d97706; }
+.wd-done { background:#e8f6ee; color:#0a9f52; }
+.wd-reject { background:#ffefef; color:#e74c3c; }
+.wd-row { display:flex; justify-content:space-between; padding:5px 0; font-size:13px; }
+.wd-k { color:#888; }
+.wd-v { color:#111; font-weight:500; }
+.wd-actions { display:flex; gap:8px; margin-top:10px; }
+.wd-btn { flex:1; padding:10px; border-radius:10px; font-size:13px; font-weight:600; border:1px solid #eaeaea; background:#fff; }
+.wd-btn.ok { background:#0a9f52; color:#fff; border-color:#0a9f52; }
+.wd-btn.no { background:#fff5f5; color:#e74c3c; border-color:#ffd5d5; }
+.wd-filter { display:flex; background:#fff; border:1px solid #eaeaea; border-radius:10px; padding:4px; margin-bottom:12px; }
+.wd-filter .f { flex:1; text-align:center; padding:8px 0; font-size:13px; color:#666; border-radius:8px; cursor:pointer; }
+.wd-filter .f.on { background:#f2f2f2; color:#000; font-weight:600; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="topbar" id="topbar"></div>
+  <div class="content">
+    <div class="wd-filter">
+      <div class="f on" data-f="0" onclick="setFilter('0')">待处理</div>
+      <div class="f" data-f="1" onclick="setFilter('1')">已打款</div>
+      <div class="f" data-f="2" onclick="setFilter('2')">已拒绝</div>
+      <div class="f" data-f="all" onclick="setFilter('all')">全部</div>
+    </div>
+    <div id="list"></div>
+  </div>
+  <nav class="tabs-bottom" id="tabs"></nav>
+</div>
+<div id="modal"></div>
+<script src="app.js"></script>
+<script>
+if (!checkAuth()) throw 0;
+renderShell('home');
+
+var allList = [];
+var filter = '0';
+
+async function load() {
+  var j = await api('/withdrawals');
+  allList = (j.code === 1) ? (j.data || []) : [];
+  render();
+}
+
+function setFilter(f) {
+  filter = f;
+  document.querySelectorAll('.wd-filter .f').forEach(function(el){
+    el.classList.toggle('on', el.dataset.f === f);
+  });
+  render();
+}
+
+function render() {
+  var list = filter === 'all' ? allList : allList.filter(function(x){ return String(x.status) === filter; });
+  var box = document.getElementById('list');
+  if (!list.length) { box.innerHTML = '<div style="text-align:center;color:#aaa;padding:40px 0">暂无记录</div>'; return; }
+  box.innerHTML = list.map(function(x){
+    var st = x.status === 1 ? '<span class="wd-tag wd-done">已打款</span>' :
+             x.status === 2 ? '<span class="wd-tag wd-reject">已拒绝</span>' :
+             '<span class="wd-tag wd-pending">待处理</span>';
+    var amount = (x.amount||0) / 100.0;
+    var fee = (amount * 0.08).toFixed(2);
+    var real = (amount - amount * 0.08).toFixed(2);
+    var d = new Date((x.created_at||0)*1000);
+    var date = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+    var actions = x.status === 0
+      ? '<div class="wd-actions"><button class="wd-btn ok" onclick="review(' + x.id + ',1)">确认打款</button><button class="wd-btn no" onclick="review(' + x.id + ',2)">拒绝</button></div>'
+      : '';
+    return '<div class="wd-card">' +
+      '<div class="wd-head"><div class="wd-email">' + (x.email||('用户#'+x.user_id)) + '</div>' + st + '</div>' +
+      '<div class="wd-row"><div class="wd-k">申请金额</div><div class="wd-v">¥' + amount.toFixed(2) + '</div></div>' +
+      '<div class="wd-row"><div class="wd-k">手续费 8%</div><div class="wd-v">¥' + fee + '</div></div>' +
+      '<div class="wd-row"><div class="wd-k">实到账</div><div class="wd-v" style="color:#0a9f52">¥' + real + '</div></div>' +
+      '<div class="wd-row"><div class="wd-k">方式</div><div class="wd-v">' + (x.method||'') + '</div></div>' +
+      '<div class="wd-row"><div class="wd-k">收款账号</div><div class="wd-v" style="font-size:12px;word-break:break-all" onclick="copyText(\'' + (x.account||'') + '\')">' + (x.account||'') + '　📋</div></div>' +
+      '<div class="wd-row"><div class="wd-k">申请时间</div><div class="wd-v">' + date + '</div></div>' +
+      actions +
+    '</div>';
+  }).join('');
+}
+
+async function review(id, status) {
+  var txt = status === 1 ? '确认已打款？' : '确认拒绝？';
+  if (!confirm(txt)) return;
+  var j = await api('/withdrawals/review', {method:'POST', body: JSON.stringify({id: id, status: status})});
+  if (j.code === 1) { toast('已处理'); setTimeout(load, 600); }
+  else { toast('失败：' + (j.msg||'')); }
+}
+
+load();
+</script>
+</body>
+</html>

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>服务器 · Lynli</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.sv-card { background:#fff; border:1px solid #eaeaea; border-radius:14px; padding:16px; margin-bottom:12px; }
+.sv-row { display:flex; justify-content:space-between; padding:7px 0; font-size:13px; border-bottom:1px solid #f5f5f5; }
+.sv-row:last-child { border-bottom:none; }
+.sv-k { color:#888; } .sv-v { color:#111; font-weight:500; word-break:break-all; }
+.sv-name { font-size:16px; font-weight:700; color:#111; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; }
+.sv-tag { font-size:11px; padding:3px 8px; border-radius:10px; font-weight:600; }
+.sv-on { background:#e8f6ee; color:#0a9f52; }
+.sv-off { background:#ffefef; color:#e74c3c; }
+.sv-btn { width:100%; padding:13px; border:1px solid #eaeaea; border-radius:10px; background:#fff; font-size:14px; color:#111; font-weight:600; margin-top:8px; }
+.sv-btn.primary { background:#2E5BFF; color:#fff; border-color:#2E5BFF; }
+.sv-input { width:100%; box-sizing:border-box; padding:12px 14px; border:1px solid #eaeaea; border-radius:10px; font-size:14px; margin:6px 0 4px; }
+.sv-del { padding:6px 12px; border:1px solid #ffd5d5; background:#fff5f5; color:#e74c3c; border-radius:8px; font-size:12px; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="topbar" id="topbar"></div>
+  <div class="content" style="padding:16px;padding-bottom:84px">
+    <div style="font-size:13px;color:#888;margin-bottom:12px">点击卡片可编辑</div>
+    <div id="list"></div>
+    <div class="sv-card">
+      <div style="font-weight:600;margin-bottom:6px">添加服务器</div>
+      <input id="sv_name" class="sv-input" placeholder="服务器名字（如 易搜加速·美西）">
+      <input id="sv_ip" class="sv-input" placeholder="IP 地址（如 167.253.96.220）">
+      <input id="sv_domain" class="sv-input" placeholder="域名（选填，如 us1.lynli.me）">
+      <input id="sv_api" class="sv-input" type="number" value="54323" placeholder="xui_api 端口">
+      <input id="sv_admin" class="sv-input" type="number" value="54324" placeholder="xui_admin 端口">
+      <input id="sv_token" class="sv-input" value="lynli_xui_2026" placeholder="X-Token">
+      <button class="sv-btn primary" onclick="addServer()">添加</button>
+    </div>
+  </div>
+  <nav class="tabs-bottom" id="tabs"></nav>
+</div>
+<div id="modal"></div>
+<script src="app.js"></script>
+<script>
+if (!checkAuth()) throw 0;
+renderShell('home');
+
+async function load() {
+  var j = await api('/servers');
+  var list = (j.code === 1) ? (j.data || []) : [];
+  var box = document.getElementById('list');
+  if (!list.length) { box.innerHTML = '<div style="text-align:center;color:#aaa;padding:30px 0">暂无服务器</div>'; return; }
+  box.innerHTML = list.map(function(s){
+    var domRow = '<div class="sv-row"><div class="sv-k">域名</div><div class="sv-v">' + (s.domain || '（未绑定）') + '</div></div>';
+    return '<div class="sv-card">' +
+      '<div class="sv-name">' + (s.name||'') +
+        '<span class="sv-tag ' + (s.enabled ? 'sv-on' : 'sv-off') + '">' + (s.enabled ? '启用' : '停用') + '</span>' +
+      '</div>' +
+      '<div class="sv-row"><div class="sv-k">IP</div><div class="sv-v">' + (s.ip||'') + '</div></div>' +
+      domRow +
+      '<div class="sv-row"><div class="sv-k">API 端口</div><div class="sv-v">' + (s.api_port||'') + '</div></div>' +
+      '<div class="sv-row"><div class="sv-k">Admin 端口</div><div class="sv-v">' + (s.admin_port||'') + '</div></div>' +
+      '<div style="display:flex;gap:8px;margin-top:10px">' +
+        '<button class="sv-btn" onclick=\'editServer(' + JSON.stringify(s).replace(/'/g, "&#39;") + ')\' style="flex:1">编辑</button>' +
+        '<button class="sv-btn" onclick="delServer(' + s.id + ')" style="flex:1;color:#e74c3c;border-color:#ffd5d5;background:#fff5f5">删除</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function editServer(s) {
+  document.getElementById('modal').innerHTML =
+    '<div class="sheet-mask" onclick="if(event.target===this)closeModal()"><div class="sheet">' +
+    '<h2>编辑服务器</h2>' +
+    '<label>名字</label><input id="e_name" value="' + (s.name||'') + '">' +
+    '<label>IP</label><input id="e_ip" value="' + (s.ip||'') + '">' +
+    '<label>域名（选填）</label><input id="e_domain" value="' + (s.domain||'') + '" placeholder="如 us1.lynli.me">' +
+    '<label>API 端口</label><input id="e_api" type="number" value="' + (s.api_port||54323) + '">' +
+    '<label>Admin 端口</label><input id="e_admin" type="number" value="' + (s.admin_port||54324) + '">' +
+    '<label>X-Token</label><input id="e_token" value="' + (s.token||'lynli_xui_2026') + '">' +
+    '<label style="display:flex;align-items:center;gap:8px;margin-top:14px"><input id="e_enabled" type="checkbox" style="width:auto;margin:0"' + (s.enabled?' checked':'') + '> 启用</label>' +
+    '<div class="btn-row" style="margin-top:16px">' +
+      '<button class="btn-cancel" onclick="closeModal()">取消</button>' +
+      '<button class="btn-primary" onclick="saveServerEdit(' + s.id + ')">保存</button>' +
+    '</div></div></div>';
+}
+window.editServer = editServer;
+
+async function saveServerEdit(id) {
+  var body = {
+    id: id,
+    name: document.getElementById('e_name').value.trim(),
+    ip: document.getElementById('e_ip').value.trim(),
+    domain: document.getElementById('e_domain').value.trim(),
+    api_port: parseInt(document.getElementById('e_api').value) || 54323,
+    admin_port: parseInt(document.getElementById('e_admin').value) || 54324,
+    token: document.getElementById('e_token').value.trim() || 'lynli_xui_2026',
+    enabled: document.getElementById('e_enabled').checked ? 1 : 0
+  };
+  if (!body.name || !body.ip) { toast('名字和 IP 必填'); return; }
+  var j = await api('/servers/save', {method:'POST', body: JSON.stringify(body)});
+  if (j.code === 1) { toast('已保存'); closeModal(); setTimeout(load, 400); }
+  else { toast('失败：' + (j.msg||'')); }
+}
+window.saveServerEdit = saveServerEdit;
+
+async function addServer() {
+  var name = document.getElementById('sv_name').value.trim();
+  var ip = document.getElementById('sv_ip').value.trim();
+  var domain = document.getElementById('sv_domain').value.trim();
+  var api_port = parseInt(document.getElementById('sv_api').value) || 54323;
+  var admin_port = parseInt(document.getElementById('sv_admin').value) || 54324;
+  var token = document.getElementById('sv_token').value.trim() || 'lynli_xui_2026';
+  if (!name || !ip) { toast('名字和 IP 必填'); return; }
+  toast('添加中...');
+  var j = await api('/servers/save', {method:'POST', body: JSON.stringify({
+    name: name, ip: ip, domain: domain, api_port: api_port, admin_port: admin_port, token: token, enabled: 1
+  })});
+  if (j.code === 1) { toast('已添加'); setTimeout(load, 500); }
+  else { toast('失败：' + (j.msg||'')); }
+}
+
+async function delServer(id) {
+  if (!confirm('确定删除该服务器？')) return;
+  toast('删除中...');
+  var j = await api('/servers/delete', {method:'POST', body: JSON.stringify({id: id})});
+  if (j.code === 1) { toast('已删除'); setTimeout(load, 500); }
+  else { toast('失败'); }
+}
+
+load();
+</script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>钱包审核 · Lynli</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.wr-card { background:#fff; border:1px solid #eaeaea; border-radius:14px; padding:14px; margin-bottom:12px; }
+.wr-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+.wr-email { font-size:14px; font-weight:600; color:#111; }
+.wr-tag { font-size:11px; padding:3px 8px; border-radius:10px; font-weight:600; }
+.wr-pending { background:#fff7e6; color:#d97706; }
+.wr-done { background:#e8f6ee; color:#0a9f52; }
+.wr-reject { background:#ffefef; color:#e74c3c; }
+.wr-row { display:flex; justify-content:space-between; padding:5px 0; font-size:13px; }
+.wr-k { color:#888; }
+.wr-v { color:#111; font-weight:500; word-break:break-all; }
+.wr-actions { display:flex; gap:8px; margin-top:10px; }
+.wr-btn { flex:1; padding:11px; border-radius:10px; font-size:13px; font-weight:600; border:1px solid #eaeaea; background:#fff; }
+.wr-btn.ok { background:#0a9f52; color:#fff; border-color:#0a9f52; }
+.wr-btn.no { background:#fff5f5; color:#e74c3c; border-color:#ffd5d5; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="topbar" id="topbar"></div>
+  <div class="content">
+    <div style="font-size:13px;color:#888;margin-bottom:12px" id="summary"></div>
+    <div id="list"></div>
+  </div>
+  <nav class="tabs-bottom" id="tabs"></nav>
+</div>
+<div id="modal"></div>
+<script src="app.js"></script>
+<script>
+if (!checkAuth()) throw 0;
+renderShell('home');
+
+async function load() {
+  var j = await api('/users');
+  var list = (j.code === 1) ? (j.data || []) : [];
+  // 只筛出提交过钱包信息但还没通过审核的
+  var pending = list.filter(function(u){
+    return u.real_name && (!u.wallet_status || u.wallet_status !== 1);
+  });
+  document.getElementById('summary').textContent = '待审核钱包：' + pending.length + ' 个';
+  var box = document.getElementById('list');
+  if (!pending.length) {
+    box.innerHTML = '<div style="text-align:center;color:#aaa;padding:40px 0">暂无待审核钱包</div>';
+    return;
+  }
+  box.innerHTML = pending.map(function(u){
+    return '<div class="wr-card">' +
+      '<div class="wr-head"><div class="wr-email">' + (u.nickname || u.email) + '</div><span class="wr-tag wr-pending">待审核</span></div>' +
+      '<div class="wr-row"><div class="wr-k">数字ID</div><div class="wr-v">' + (u.short_id||'') + '</div></div>' +
+      '<div class="wr-row"><div class="wr-k">邮箱</div><div class="wr-v">' + (u.email||'') + '</div></div>' +
+      '<div class="wr-row"><div class="wr-k">真实姓名</div><div class="wr-v">' + (u.real_name||'—') + '</div></div>' +
+      '<div class="wr-row"><div class="wr-k">USDT</div><div class="wr-v" onclick="copyText(\'' + (u.usdt_addr||'') + '\')">' + (u.usdt_addr||'—') + (u.usdt_addr?'　📋':'') + '</div></div>' +
+      '<div class="wr-row"><div class="wr-k">支付宝</div><div class="wr-v" onclick="copyText(\'' + (u.alipay||'') + '\')">' + (u.alipay||'—') + (u.alipay?'　📋':'') + '</div></div>' +
+      '<div class="wr-actions">' +
+        '<button class="wr-btn ok" onclick="review(' + u.id + ',1)">通过</button>' +
+        '<button class="wr-btn no" onclick="review(' + u.id + ',2)">拒绝</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+async function review(id, status) {
+  var txt = status === 1 ? '确认通过该用户的钱包审核？' : '确认拒绝？';
+  if (!confirm(txt)) return;
+  var j = await api('/wallet/review', {method:'POST', body: JSON.stringify({id: id, status: status})});
+  if (j.code === 1) { toast('已处理'); setTimeout(load, 600); }
+  else { toast('失败：' + (j.msg||'')); }
+}
+
+load();
+</script>
+</body>
+</html>

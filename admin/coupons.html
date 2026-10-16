@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>优惠码 · Lynli</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.cp-card { background:#fff; border:1px solid #eaeaea; border-radius:14px; padding:16px; margin-bottom:12px; }
+.cp-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+.cp-code { font-size:17px; font-weight:700; color:#111; font-family:ui-monospace, Menlo, monospace; letter-spacing:1px; }
+.cp-tag { font-size:11px; padding:3px 8px; border-radius:10px; font-weight:600; }
+.cp-on { background:#e8f6ee; color:#0a9f52; }
+.cp-off { background:#ffefef; color:#e74c3c; }
+.cp-row { display:flex; justify-content:space-between; padding:6px 0; font-size:13px; border-bottom:1px solid #f5f5f5; }
+.cp-row:last-child { border-bottom:none; }
+.cp-k { color:#888; } .cp-v { color:#111; font-weight:500; }
+.cp-actions { display:flex; gap:8px; margin-top:10px; }
+.cp-btn { flex:1; padding:11px; border:1px solid #eaeaea; border-radius:10px; background:#fff; font-size:13px; font-weight:600; }
+.cp-btn.danger { color:#e74c3c; border-color:#ffd5d5; background:#fff5f5; }
+.cp-input { width:100%; box-sizing:border-box; padding:11px 13px; border:1px solid #eaeaea; border-radius:10px; font-size:14px; margin:6px 0 4px; font-family:inherit; }
+.cp-select { width:100%; box-sizing:border-box; padding:11px 13px; border:1px solid #eaeaea; border-radius:10px; font-size:14px; margin:6px 0 4px; background:#fff; font-family:inherit; }
+.cp-label { font-size:12px; color:#888; font-weight:600; display:block; margin-top:8px; }
+.cp-empty { text-align:center; padding:40px 20px; color:#bbb; font-size:13px; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="topbar" id="topbar"></div>
+  <div class="content" style="padding:14px;padding-bottom:84px">
+    <div id="list"><div class="cp-empty">加载中...</div></div>
+    <div class="cp-card">
+      <div style="font-weight:700;font-size:15px;margin-bottom:8px">新建优惠码</div>
+      <label class="cp-label">优惠码（字母数字）</label>
+      <input id="cp_code" class="cp-input" placeholder="如 WELCOME20" style="text-transform:uppercase">
+      <label class="cp-label">类型</label>
+      <select id="cp_type" class="cp-select">
+        <option value="percent">百分比折扣</option>
+        <option value="fixed">固定减免</option>
+      </select>
+      <label class="cp-label">优惠值（百分比填 20 就是打 8 折；固定填分，如 500 = 5 元）</label>
+      <input id="cp_value" class="cp-input" type="number" placeholder="20">
+      <label class="cp-label">最低金额（分，0 = 不限）</label>
+      <input id="cp_min" class="cp-input" type="number" value="0">
+      <label class="cp-label">最大使用次数（0 = 不限）</label>
+      <input id="cp_max" class="cp-input" type="number" value="0">
+      <label class="cp-label">过期时间戳（秒，0 = 永不过期）</label>
+      <input id="cp_exp" class="cp-input" type="number" value="0">
+      <button class="cp-btn" style="background:#2E5BFF;color:#fff;border-color:#2E5BFF;width:100%;margin-top:12px" onclick="addCoupon()">创建</button>
+    </div>
+  </div>
+  <nav class="tabs-bottom" id="tabs"></nav>
+</div>
+<div id="modal"></div>
+<script src="app.js"></script>
+<script>
+if (!checkAuth()) throw 0;
+renderShell('home');
+
+function fmtDate(ts) {
+  if (!ts) return '永不';
+  var d = new Date(ts * 1000);
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+async function load() {
+  var j = await api('/coupons');
+  var list = (j.code === 1) ? (j.data || []) : [];
+  var box = document.getElementById('list');
+  if (!list.length) { box.innerHTML = '<div class="cp-empty">暂无优惠码</div>'; return; }
+  box.innerHTML = list.map(function(c){
+    var tag = c.enabled ? '<span class="cp-tag cp-on">启用</span>' : '<span class="cp-tag cp-off">停用</span>';
+    var typeTxt = c.type === 'percent' ? ('打 ' + (100 - c.value) / 10 + ' 折') : ('减 ¥' + (c.value/100).toFixed(2));
+    var usedTxt = c.max_uses ? (c.used + ' / ' + c.max_uses) : (c.used + ' / 不限');
+    var minTxt = c.min_amount ? ('¥' + (c.min_amount/100).toFixed(2)) : '不限';
+    return '<div class="cp-card">' +
+      '<div class="cp-head"><div class="cp-code">' + c.code + '</div>' + tag + '</div>' +
+      '<div class="cp-row"><div class="cp-k">优惠</div><div class="cp-v">' + typeTxt + '</div></div>' +
+      '<div class="cp-row"><div class="cp-k">已用 / 上限</div><div class="cp-v">' + usedTxt + '</div></div>' +
+      '<div class="cp-row"><div class="cp-k">最低金额</div><div class="cp-v">' + minTxt + '</div></div>' +
+      '<div class="cp-row"><div class="cp-k">过期</div><div class="cp-v">' + fmtDate(c.expire_at) + '</div></div>' +
+      '<div class="cp-actions">' +
+        '<button class="cp-btn" onclick="toggleCoupon(' + c.id + ',' + (c.enabled ? 0 : 1) + ')">' + (c.enabled ? '停用' : '启用') + '</button>' +
+        '<button class="cp-btn danger" onclick="delCoupon(' + c.id + ')">删除</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+async function addCoupon() {
+  var body = {
+    code: document.getElementById('cp_code').value.trim().toUpperCase(),
+    type: document.getElementById('cp_type').value,
+    value: parseInt(document.getElementById('cp_value').value) || 0,
+    min_amount: parseInt(document.getElementById('cp_min').value) || 0,
+    max_uses: parseInt(document.getElementById('cp_max').value) || 0,
+    expire_at: parseInt(document.getElementById('cp_exp').value) || 0,
+    enabled: 1
+  };
+  if (!body.code) { toast('请填优惠码'); return; }
+  if (body.value <= 0) { toast('优惠值必须大于 0'); return; }
+  toast('创建中...');
+  var j = await api('/coupons/save', {method:'POST', body: JSON.stringify(body)});
+  if (j.code === 1) { toast('已创建'); setTimeout(load, 400); }
+  else { toast('失败：' + (j.msg||'')); }
+}
+
+async function toggleCoupon(id, enabled) {
+  var j = await api('/coupons/save', {method:'POST', body: JSON.stringify({id: id, code: 'x', type: 'percent', value: 1, enabled: enabled, _partial: true})});
+  // 由于 save 需要完整字段，改用直接调用：先取原值
+  // 简单做法：重新加载后按 id 取原值再保存
+  // 为避免复杂，这里用一个轻量接口
+  var r = await api('/coupons');
+  var c = (r.data || []).find(function(x){ return x.id === id; });
+  if (!c) return;
+  await api('/coupons/save', {method:'POST', body: JSON.stringify({
+    id: c.id, code: c.code, type: c.type, value: c.value,
+    min_amount: c.min_amount, max_uses: c.max_uses, expire_at: c.expire_at, enabled: enabled
+  })});
+  toast(enabled ? '已启用' : '已停用');
+  setTimeout(load, 400);
+}
+
+async function delCoupon(id) {
+  if (!(await cConfirm('确定删除该优惠码？'))) return;
+  var j = await api('/coupons/delete', {method:'POST', body: JSON.stringify({id: id})});
+  if (j.code === 1) { toast('已删除'); setTimeout(load, 400); }
+  else toast('失败');
+}
+
+load();
+</script>
+</body>
+</html>
