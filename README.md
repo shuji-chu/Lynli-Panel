@@ -1,4 +1,27 @@
-# Lynli Panel
+<div align="center">
+
+# 🚀 Lynli Panel
+
+**轻量 VPN / 代理管理面板**
+
+Python + SQLite 后端 · 原生 HTML/JS 前端 · 零框架依赖
+
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
+[![Python](https://img.shields.io/badge/Python-3.8%2B-3776AB.svg?logo=python&logoColor=white)](https://www.python.org/)
+[![SQLite](https://img.shields.io/badge/SQLite-3-003B57.svg?logo=sqlite&logoColor=white)](https://sqlite.org)
+[![Clash](https://img.shields.io/badge/Clash-yaml-2E5BFF.svg)](#订阅格式)
+[![V2Ray](https://img.shields.io/badge/V2Ray-base64-blueviolet.svg)](#订阅格式)
+[![sing-box](https://img.shields.io/badge/sing--box-json-green.svg)](#订阅格式)
+
+[![Stars](https://img.shields.io/github/stars/shuji-chu/Lynli-Panel?style=social)](https://github.com/shuji-chu/Lynli-Panel/stargazers)
+[![Forks](https://img.shields.io/github/forks/shuji-chu/Lynli-Panel?style=social)](https://github.com/shuji-chu/Lynli-Panel/network/members)
+
+[功能](#-功能) · [快速开始](#-快速开始) · [API](#-api-文档) · [联系我](#-联系我)
+
+---
+
+</div>
+
 
 > 轻量 VPN/代理管理面板。Python + SQLite 后端，纯 HTML/JS 前端，支持 Clash / V2Ray / sing-box 多格式订阅。
 >
