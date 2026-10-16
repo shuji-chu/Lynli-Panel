@@ -183,6 +183,28 @@ AGPL-3.0（详见 LICENSE）
 
 任何人可以自由使用、修改、分发，但修改后必须在相同许可下开源。
 
+## 📱 配套 APP
+
+Lynli 有配套的 Android 客户端（基于 CMFA 修改）：
+
+- 一键连接 / 分应用代理 / 每日签到
+- 与面板共用同一套 API，填你的域名即可对接
+
+| 渠道 | 链接 |
+|---|---|
+| Release | https://github.com/shuji-chu/Lynli-Release/releases |
+| 最新 APK | https://dl.yisoujiasu.de5.net/v0.7.9/Lynli.apk |
+
+## 🎁 官方社群
+
+| 社群 | 链接 | 说明 |
+|---|---|---|
+| 签到群 | https://m.mivra.im/SOCKS5 | 每天签到领 1-3 GB 流量 |
+| 搜索引擎群 | https://m.mivra.im/ys888 | 产品交流 / 技术讨论 |
+| Issues | https://github.com/shuji-chu/Lynli-Panel/issues | 提 bug / 建议 |
+
+> 注：以上链接是官方演示实例。**自己部署时，把这两个链接换成你自己的。**
+
 ## 交流与反馈
 
 - 使用中遇到问题 → 提 [Issue](https://github.com/shuji-chu/Lynli-Panel/issues)
