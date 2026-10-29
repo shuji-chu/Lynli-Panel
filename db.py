@@ -26,7 +26,8 @@ def init():
       transfer_enable INTEGER DEFAULT 107374182400,
       u INTEGER DEFAULT 0, d INTEGER DEFAULT 0,
       expired_at INTEGER DEFAULT 0, created_at INTEGER,
-      plan_id INTEGER DEFAULT 0, banned INTEGER DEFAULT 0
+      plan_id INTEGER DEFAULT 0, banned INTEGER DEFAULT 0,
+      short_id VARCHAR(5) UNIQUE, nickname TEXT DEFAULT '', avatar TEXT DEFAULT ''
     );
     CREATE TABLE IF NOT EXISTS plans(
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -60,6 +61,26 @@ CREATE TABLE IF NOT EXISTS admins(
       email TEXT UNIQUE, password TEXT, created_at INTEGER
     );
     """)
+    # Safe schema upgrades for databases created by older versions.
+    user_cols = {r[1] for r in c.execute("PRAGMA table_info(users)").fetchall()}
+    for col, ddl in (("short_id", "VARCHAR(5)"), ("nickname", "TEXT DEFAULT ''"), ("avatar", "TEXT DEFAULT ''"), ("avatar_url", "TEXT DEFAULT ''")):
+        if col not in user_cols: c.execute("ALTER TABLE users ADD COLUMN %s %s" % (col, ddl))
+    plan_cols = {r[1] for r in c.execute("PRAGMA table_info(plans)").fetchall()}
+    if "product_type" not in plan_cols: c.execute("ALTER TABLE plans ADD COLUMN product_type TEXT DEFAULT 'node'")
+    if "tagline" not in plan_cols: c.execute("ALTER TABLE plans ADD COLUMN tagline TEXT DEFAULT ''")
+    if "speed" not in plan_cols: c.execute("ALTER TABLE plans ADD COLUMN speed TEXT DEFAULT ''")
+    if "hot" not in plan_cols: c.execute("ALTER TABLE plans ADD COLUMN hot INTEGER DEFAULT 0")
+    if "features" not in plan_cols: c.execute("ALTER TABLE plans ADD COLUMN features TEXT DEFAULT '[]'")
+    alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
+    for row in c.execute("SELECT id, short_id FROM users").fetchall():
+        sid = str(row["short_id"] or "").strip().upper()
+        valid = len(sid) == 5 and all(ch in alphabet for ch in sid)
+        if not valid or c.execute("SELECT 1 FROM users WHERE short_id=? AND id<>?", (sid, row["id"])).fetchone():
+            for _ in range(100):
+                sid = "".join(secrets.choice(alphabet) for _ in range(5))
+                if not c.execute("SELECT 1 FROM users WHERE short_id=?", (sid,)).fetchone(): break
+            c.execute("UPDATE users SET short_id=? WHERE id=?", (sid, row["id"]))
+    c.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_users_short_id_unique ON users(short_id)")
     if not c.execute("SELECT 1 FROM plans LIMIT 1").fetchone():
         c.executemany("INSERT INTO plans(name,content,transfer_enable,month_price,quarter_price,half_year_price,year_price,sort) VALUES(?,?,?,?,?,?,?,?)", [
           ("\u6708\u4ed8\u5957\u9910", "30\u5929 / 100GB", 107374182400, 1500, 4000, 7500, 15000, 1),
@@ -123,7 +144,7 @@ def plan_to_dict(r):
             feats = []
 
     return {"id": r["id"], "group_id": 1, "transfer_enable": r["transfer_enable"],
-            "name": r["name"], "speed_limit": 0, "show": r["show"], "sort": r["sort"], "renew": 1,
+            "name": r["name"], "type": (_g("product_type") or "node"), "speed_limit": 0, "show": r["show"], "sort": r["sort"], "renew": 1,
             "content": r["content"], "month_price": month,
             "tagline": _g("tagline") or "",
             "speed": _g("speed") or "",
