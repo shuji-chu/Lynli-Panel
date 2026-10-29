@@ -594,7 +594,7 @@ def handle(ctx):
     if p == "/api/v1/admin/plans" and m == "POST":
         pid = b.get("id")
         fields = ("name","content","transfer_enable","month_price","quarter_price",
-                  "half_year_price","year_price","sort","show","type","tagline","speed","hot","features")
+                  "half_year_price","year_price","sort","show","type","product_type","tagline","speed","hot","features")
         vals = []
         for f in fields:
             v = b.get(f)
@@ -603,12 +603,12 @@ def handle(ctx):
             vals.append(v)
         if pid:
             c.execute("UPDATE plans SET name=?,content=?,transfer_enable=?,month_price=?,quarter_price=?,"
-                      "half_year_price=?,year_price=?,sort=?,show=?,type=?,tagline=?,speed=?,hot=?,features=? WHERE id=?",
+                      "half_year_price=?,year_price=?,sort=?,show=?,type=?,product_type=?,tagline=?,speed=?,hot=?,features=? WHERE id=?",
                       vals + [pid])
         else:
             c.execute("INSERT INTO plans(name,content,transfer_enable,month_price,quarter_price,"
-                      "half_year_price,year_price,sort,show,type,tagline,speed,hot,features) "
-                      "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)", vals)
+                      "half_year_price,year_price,sort,show,type,product_type,tagline,speed,hot,features) "
+                      "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", vals)
         _log(c, admin_email, "plan", f"plan#{pid or 'new'}", b.get("name","", ctx))
         c.commit(); c.close(); ctx["send"]({"code":1}); return True
     if p == "/api/v1/admin/plans/delete" and m == "POST":
