@@ -4,10 +4,10 @@ from urllib.parse import parse_qsl
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 
 import db
-import api_config, api_auth, api_user, api_plans, api_orders, api_misc, api_admin, api_bots, api_pay, api_extra, api_oauth, api_captcha
+import api_config, api_auth, api_user, api_plans, api_orders, api_misc, api_admin, api_bots, api_pay, api_extra, api_oauth, api_captcha, api_upload
 
 PORT = 7001
-MODULES = [api_extra, api_oauth, api_captcha, api_config, api_auth, api_user, api_plans, api_orders, api_misc, api_admin, api_bots, api_pay]
+MODULES = [api_extra, api_oauth, api_captcha, api_config, api_auth, api_user, api_plans, api_orders, api_misc, api_admin, api_bots, api_pay, api_upload]
 
 class H(BaseHTTPRequestHandler):
     def log_message(self, *a): pass
@@ -18,7 +18,7 @@ class H(BaseHTTPRequestHandler):
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Content-Length", str(len(body)))
         self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header("Access-Control-Allow-Headers", "Authorization,Content-Type")
+        self.send_header("Access-Control-Allow-Headers", "Authorization,Content-Type,X-Requested-With")
         self.end_headers()
         self.wfile.write(body)
 
@@ -93,6 +93,7 @@ class H(BaseHTTPRequestHandler):
         self.send_header("Access-Control-Allow-Origin", "*")
         self.send_header("Access-Control-Allow-Headers", "Authorization,Content-Type")
         self.send_header("Access-Control-Allow-Methods", "GET,POST,OPTIONS")
+        self.send_header("Access-Control-Max-Age", "86400")
         self.end_headers()
 
 if __name__ == "__main__":
