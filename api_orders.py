@@ -17,7 +17,7 @@ def handle(ctx):
         out = []
         for r in rows:
             out.append({"id": r["user_id"], "trade_no": r["trade_no"], "plan_id": r["plan_id"],
-                        "period": r["period"], "total_amount": r["total_amount"],
+                        "period": r["period"], "total_amount": r["total_amount"], "protocol": r["protocol"] if "protocol" in r.keys() else "",
                         "status": r["status"], "created_at": r["created_at"],
                         "plan": db.plan_to_dict(db.plan_by_id(r["plan_id"]))})
         ctx["send"]({"data": out, "message": "", "status": "success"}); return True
@@ -29,7 +29,7 @@ def handle(ctx):
         c.close()
         if not r: ctx["send"]({"data": None, "message": "not found", "status": "fail"}); return True
         ctx["send"]({"data": {"trade_no": r["trade_no"], "plan_id": r["plan_id"],
-                              "period": r["period"], "total_amount": r["total_amount"],
+                              "period": r["period"], "total_amount": r["total_amount"], "protocol": r["protocol"] if "protocol" in r.keys() else "",
                               "status": r["status"], "created_at": r["created_at"],
                               "paid_at": None, "plan": db.plan_to_dict(db.plan_by_id(r["plan_id"]))}}); return True
 
@@ -53,6 +53,9 @@ def handle(ctx):
         if method not in ("alipay", "usdt"):
             method = "alipay"
         amt = pl[PRICE_FIELD.get(period, "month_price")] or 0
+        protocol = (b.get("protocol") or "").strip().lower()
+        if protocol and protocol not in ("vless", "vmess", "hysteria2", "trojan"):
+            ctx["send"]({"data": None, "message": "不支持的节点协议", "status": "fail"}, 400); return True
         c = db.connect()
         # 优惠码
         coupon_code = (b.get("coupon_code") or "").strip().upper()
@@ -72,8 +75,8 @@ def handle(ctx):
                         amt = max(0, amt - cp["value"])
                     coupon_id = cp["id"]
         tn = "LN" + str(int(time.time())) + secrets.token_hex(2).upper()
-        c.execute("INSERT INTO orders(trade_no,user_id,plan_id,period,total_amount,created_at,method) VALUES(?,?,?,?,?,?,?)",
-                  (tn, u["id"], pid, period, amt, int(time.time()), method))
+        c.execute("INSERT INTO orders(trade_no,user_id,plan_id,period,total_amount,created_at,method,protocol) VALUES(?,?,?,?,?,?,?,?)",
+                  (tn, u["id"], pid, period, amt, int(time.time()), method, protocol))
         if coupon_id:
             c.execute("UPDATE coupons SET used = used + 1 WHERE id=?", (coupon_id,))
         c.commit(); c.close()
