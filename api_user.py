@@ -115,6 +115,30 @@ def handle(ctx):
         ctx["raw_send"](yaml_text.encode("utf-8"))
         return True
 
+    if p == "/api/v1/user/update" and ctx["method"] == "POST":
+        u = db.user_by_token(ctx["token"])
+        if not u:
+            ctx["send"]({"data": None, "message": "unauth", "status": "fail"}, 401); return True
+        body = ctx.get("body") or {}
+        nickname, avatar_url = body.get("nickname"), body.get("avatar_url")
+        if nickname is not None:
+            nickname = str(nickname).strip()
+            if len(nickname) > 40:
+                ctx["send"]({"data": None, "message": "昵称不能超过40字", "status": "fail"}, 400); return True
+        if avatar_url is not None:
+            avatar_url = str(avatar_url).strip()
+            if len(avatar_url) > 2048 or (avatar_url and not avatar_url.startswith(("https://", "http://"))):
+                ctx["send"]({"data": None, "message": "avatar_url 必须是有效的 http(s) 链接", "status": "fail"}, 400); return True
+        c = db.connect(); cols = {r[1] for r in c.execute("PRAGMA table_info(users)").fetchall()}; sets, vals = [], []
+        if nickname is not None: sets.append("nickname=?"); vals.append(nickname)
+        if avatar_url is not None:
+            if "avatar_url" in cols: sets.append("avatar_url=?"); vals.append(avatar_url)
+            if "avatar" in cols: sets.append("avatar=?"); vals.append(avatar_url)
+        if sets:
+            vals.append(u["id"]); c.execute("UPDATE users SET " + ", ".join(sets) + " WHERE id=?", vals)
+        updated = c.execute("SELECT * FROM users WHERE id=?", (u["id"],)).fetchone(); c.commit(); c.close(); keys = updated.keys()
+        ctx["send"]({"data": {"id": updated["id"], "email": updated["email"], "short_id": updated["short_id"] if "short_id" in keys else "", "nickname": updated["nickname"] if "nickname" in keys else "", "avatar_url": (updated["avatar_url"] if "avatar_url" in keys and updated["avatar_url"] else (updated["avatar"] if "avatar" in keys else ""))}, "message": "", "status": "success"}); return True
+
     if p == "/api/v1/user/wallet/submit" and ctx["method"] == "POST":
         u = db.user_by_token(ctx["token"])
         if not u: ctx["send"]({"data": None, "message": "unauth", "status": "fail"}, 401); return True
@@ -264,7 +288,7 @@ def handle(ctx):
             "banned": u["banned"], "remindExpire": 0, "remindTraffic": 0,
             "expiredAt": u["expired_at"], "balance": 0, "commissionBalance": 0,
             "uuid": u["uuid"], "avatarURL": avatar, "shortId": u["short_id"] if "short_id" in keys else 0,
-            "nickname": nickname}}); return True
+            "nickname": nickname, "user": {"id": u["id"], "email": u["email"], "short_id": u["short_id"] if "short_id" in keys else "", "nickname": nickname, "avatar_url": (u["avatar_url"] if "avatar_url" in keys and u["avatar_url"] else avatar)}}}); return True
 
     plan = db.plan_to_dict(db.plan_by_id(u["plan_id"])) if u["plan_id"] else None
     ctx["send"]({"data": {
