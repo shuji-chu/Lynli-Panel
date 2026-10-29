@@ -117,6 +117,11 @@ def handle(ctx):
         r2 = c.execute("SELECT user_id FROM invites WHERE code=?", (invite_code,)).fetchone()
         if r2:
             inviter_id = r2["user_id"]
+        else:
+            # The five-character short_id is also accepted as an invite code.
+            r2 = c.execute("SELECT id AS user_id FROM users WHERE short_id=?", (invite_code,)).fetchone()
+            if r2:
+                inviter_id = r2["user_id"]
 
     tok = db.new_token()
     sid = _gen_short_id(c)
