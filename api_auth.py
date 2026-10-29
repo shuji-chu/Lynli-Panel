@@ -12,11 +12,16 @@ SEND_INTERVAL = 60
 
 
 def _gen_short_id(c):
-    row = c.execute("SELECT MAX(short_id) FROM users WHERE short_id > 0").fetchone()
-    cur = (row[0] if row and row[0] else 0)
-    if cur < 1000:
-        return 1000
-    return cur + 1
+    alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
+    for _ in range(100):
+        sid = "".join(secrets.choice(alphabet) for _ in range(5))
+        if not c.execute("SELECT 1 FROM users WHERE short_id=?", (sid,)).fetchone(): return sid
+    raise RuntimeError("无法生成唯一 short_id，请重试")
+
+
+def _user_public(u):
+    keys = u.keys()
+    return {"id": u["id"], "email": u["email"], "short_id": u["short_id"] if "short_id" in keys else "", "nickname": u["nickname"] if "nickname" in keys else "", "avatar_url": (u["avatar_url"] if "avatar_url" in keys and u["avatar_url"] else (u["avatar"] if "avatar" in keys else ""))}
 
 
 def handle(ctx):
@@ -91,7 +96,7 @@ def handle(ctx):
         except Exception:
             pass
         c.commit(); c.close()
-        ctx["send"]({"message": "", "data": {"token": tok, "isAdmin": 0, "auth_data": tok}}); return True
+        ctx["send"]({"message": "", "data": {"token": tok, "isAdmin": 0, "auth_data": tok, "user": _user_public(u)}}); return True
 
     code = (body.get("code") or "").strip()
     if not code:
@@ -133,5 +138,6 @@ def handle(ctx):
             print("[invite] user#" + str(inviter_id) + " +" + str(_gb) + "GB  |  new " + email + " +" + str(_gb) + "GB", flush=True)
         c.execute("UPDATE invites SET signups = COALESCE(signups,0) + 1 WHERE code=?", (invite_code,))
     c.execute("DELETE FROM email_codes WHERE email=?", (email,))
+    new_user = c.execute("SELECT * FROM users WHERE email=?", (email,)).fetchone()
     c.commit(); c.close()
-    ctx["send"]({"message": "", "data": {"token": tok, "isAdmin": 0, "auth_data": tok}}); return True
+    ctx["send"]({"message": "", "data": {"token": tok, "isAdmin": 0, "auth_data": tok, "user": _user_public(new_user)}}); return True
