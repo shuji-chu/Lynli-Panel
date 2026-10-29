@@ -44,7 +44,7 @@ def init():
     CREATE TABLE IF NOT EXISTS orders(
       trade_no TEXT PRIMARY KEY, user_id INTEGER, plan_id INTEGER,
       period TEXT, total_amount INTEGER, status INTEGER DEFAULT 0,
-      created_at INTEGER
+      protocol TEXT DEFAULT '', created_at INTEGER
     );
     CREATE TABLE IF NOT EXISTS invites(
       code TEXT PRIMARY KEY, user_id INTEGER, pv INTEGER DEFAULT 0,
@@ -63,6 +63,9 @@ CREATE TABLE IF NOT EXISTS admins(
     """)
     # Safe schema upgrades for databases created by older versions.
     user_cols = {r[1] for r in c.execute("PRAGMA table_info(users)").fetchall()}
+    order_cols = {r[1] for r in c.execute("PRAGMA table_info(orders)").fetchall()}
+    if "protocol" not in order_cols:
+        c.execute("ALTER TABLE orders ADD COLUMN protocol TEXT DEFAULT ''")
     for col, ddl in (("short_id", "VARCHAR(5)"), ("nickname", "TEXT DEFAULT ''"), ("avatar", "TEXT DEFAULT ''"), ("avatar_url", "TEXT DEFAULT ''")):
         if col not in user_cols: c.execute("ALTER TABLE users ADD COLUMN %s %s" % (col, ddl))
     plan_cols = {r[1] for r in c.execute("PRAGMA table_info(plans)").fetchall()}
